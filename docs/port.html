@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Cecil V." />
+
+<meta name="date" content="2019-09-30" />
+
+<title>Excelencia Operacional Puerto</title>
+
+<script src="site_libs/jquery-1.12.4/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+<script src="site_libs/htmlwidgets-1.3/htmlwidgets.js"></script>
+<link href="site_libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="site_libs/datatables-binding-0.9/datatables.js"></script>
+<link href="site_libs/dt-core-1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="site_libs/dt-core-1.10.19/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="site_libs/dt-core-1.10.19/js/jquery.dataTables.min.js"></script>
+<link href="site_libs/crosstalk-1.0.0/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.0.0/js/crosstalk.min.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  { background-color: #f8f8f8; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">ExOpMLP</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Excelencia Operacional Puerto</h1>
+<h4 class="author">Cecil V.</h4>
+<h4 class="date">2019-09-30</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2019-09-30
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>ExOpMLP/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.4.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20190929code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20190929)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20190929code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20190929)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong13645bd"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> 13645bd </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrong13645bd" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    data/comminution/
+    Ignored:    data/mine/
+    Ignored:    data/port/
+    Ignored:    output/mine/
+
+Untracked files:
+    Untracked:  analysis/.gitignore
+    Untracked:  code/__pycache__/
+    Untracked:  code/utils_gps.py
+    Untracked:  code/utils_mine.py
+    Untracked:  docs/figure/
+    Untracked:  figure/
+
+Unstaged changes:
+    Modified:   .gitignore
+    Modified:   analysis/port.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the R Markdown and HTML files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view them.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+13645bd
+</td>
+<td>
+ceanver
+</td>
+<td>
+2019-09-30
+</td>
+<td>
+First Commit
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>The goal of this project is to provide an insight of what are the main features that affect the filtering rate at port. Additionally, we aim to construct a predictive model that will be able to give an accurate result for the filtering rate beforehand.</p>
+</div>
+<div id="dependencies" class="section level1 tabset">
+<h1><span class="header-section-number">2</span> Dependencies</h1>
+<div id="required-libraries" class="section level2">
+<h2><span class="header-section-number">2.1</span> Required libraries</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">multiplot &lt;-<span class="st"> </span><span class="cf">function</span>(..., <span class="dt">plotlist=</span><span class="ot">NULL</span>, file, <span class="dt">cols=</span><span class="dv">1</span>, <span class="dt">layout=</span><span class="ot">NULL</span>) {</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">  plots &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">list</span>(...), plotlist)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3">  numPlots =<span class="st"> </span><span class="kw">length</span>(plots)</a>
+<a class="sourceLine" id="cb1-4" data-line-number="4">  <span class="cf">if</span> (<span class="kw">is.null</span>(layout)) {</a>
+<a class="sourceLine" id="cb1-5" data-line-number="5">    layout &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">seq</span>(<span class="dv">1</span>, cols <span class="op">*</span><span class="st"> </span><span class="kw">ceiling</span>(numPlots<span class="op">/</span>cols)),</a>
+<a class="sourceLine" id="cb1-6" data-line-number="6">                    <span class="dt">ncol =</span> cols, <span class="dt">nrow =</span> <span class="kw">ceiling</span>(numPlots<span class="op">/</span>cols))</a>
+<a class="sourceLine" id="cb1-7" data-line-number="7">  }</a>
+<a class="sourceLine" id="cb1-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb1-9" data-line-number="9"> <span class="cf">if</span> (numPlots<span class="op">==</span><span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb1-10" data-line-number="10">    <span class="kw">print</span>(plots[[<span class="dv">1</span>]])</a>
+<a class="sourceLine" id="cb1-11" data-line-number="11">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb1-12" data-line-number="12">    <span class="kw">grid.newpage</span>()</a>
+<a class="sourceLine" id="cb1-13" data-line-number="13">    <span class="kw">pushViewport</span>(<span class="kw">viewport</span>(<span class="dt">layout =</span> <span class="kw">grid.layout</span>(<span class="kw">nrow</span>(layout), <span class="kw">ncol</span>(layout))))</a>
+<a class="sourceLine" id="cb1-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb1-15" data-line-number="15">    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>numPlots) {</a>
+<a class="sourceLine" id="cb1-16" data-line-number="16">      matchidx &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">which</span>(layout <span class="op">==</span><span class="st"> </span>i, <span class="dt">arr.ind =</span> <span class="ot">TRUE</span>))</a>
+<a class="sourceLine" id="cb1-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb1-18" data-line-number="18">      <span class="kw">print</span>(plots[[i]], <span class="dt">vp =</span> <span class="kw">viewport</span>(<span class="dt">layout.pos.row =</span> matchidx<span class="op">$</span>row,</a>
+<a class="sourceLine" id="cb1-19" data-line-number="19">                                      <span class="dt">layout.pos.col =</span> matchidx<span class="op">$</span>col))</a>
+<a class="sourceLine" id="cb1-20" data-line-number="20">    }</a>
+<a class="sourceLine" id="cb1-21" data-line-number="21">  }</a>
+<a class="sourceLine" id="cb1-22" data-line-number="22">}</a></code></pre></div>
+</div>
+<div id="load-data-to-py" class="section level2">
+<h2><span class="header-section-number">2.2</span> Load data to py</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="im">import</span> os</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="im">import</span> pandas <span class="im">as</span> pd</a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="im">import</span> numpy <span class="im">as</span> np</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4">df_port <span class="op">=</span> pd.read_excel(<span class="st">&#39;data/port/Data Diaria 2018 2019.xlsx&#39;</span>, usecols <span class="op">=</span> <span class="st">&#39;B:U&#39;</span>)</a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6">df_port.rename(columns <span class="op">=</span> {<span class="st">&#39;Día Operacional&#39;</span>: <span class="st">&#39;date&#39;</span>}, inplace<span class="op">=</span><span class="va">True</span>)</a>
+<a class="sourceLine" id="cb2-7" data-line-number="7">df_port <span class="op">=</span> df_port.drop(columns <span class="op">=</span> [<span class="st">&quot;date&quot;</span>])</a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co"># df_port[&#39;date&#39;] = pd.to_datetime(df_port[&#39;date&#39;])</span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co"># df_port = df_port.set_index(&#39;date&#39;)</span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="co"># display(set(df_filtering.loc[~df_filtering[&quot;pH&quot;].astype(str).str.isdigit(), &quot;pH&quot;].tolist())) </span></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13">df_port <span class="op">=</span> df_port.replace(<span class="st">&#39;S/O&#39;</span>, np.nan) <span class="co">## missing value string</span></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14">df_port <span class="op">=</span> df_port.replace({<span class="st">&#39;,&#39;</span>: <span class="st">&#39;.&#39;</span>}, regex<span class="op">=</span><span class="va">True</span>)</a>
+<a class="sourceLine" id="cb2-15" data-line-number="15">df_port[<span class="st">&#39;COT&#39;</span>] <span class="op">=</span> df_port[<span class="st">&#39;COT&#39;</span>].replace(<span class="st">&#39;&lt; 0.1&#39;</span>, <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb2-16" data-line-number="16">df_port <span class="op">=</span> df_port.dropna(how <span class="op">=</span> <span class="st">&#39;all&#39;</span>)</a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co"># df_port = df_port.apply(pd.to_numeric)</span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co"># df_port.fillna(df_port.mean(), inplace = True)</span></a>
+<a class="sourceLine" id="cb2-19" data-line-number="19">          </a>
+<a class="sourceLine" id="cb2-20" data-line-number="20">df_port.to_csv(<span class="st">&quot;data/port/df_port.csv&quot;</span>, index <span class="op">=</span> <span class="va">False</span>)</a></code></pre></div>
+</div>
+<div id="load-data-to-r" class="section level2">
+<h2><span class="header-section-number">2.3</span> Load data to R</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">port &lt;-<span class="st"> </span><span class="kw">as_tibble</span>(<span class="kw">fread</span>(<span class="st">&quot;data/port/df_port.csv&quot;</span>))</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2">port &lt;-<span class="st"> </span>port <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw">clean_names</span>(., <span class="st">&quot;snake&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="st">  </span><span class="kw">rename</span>(</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">      <span class="dt">hum_pct =</span> humedad_percent, <span class="co"># % de humedad</span></a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">      <span class="dt">x10_pct =</span> x10_number_percent, </a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">      <span class="dt">ph =</span> p_h, <span class="co"># PH</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">      <span class="dt">tft_ca_pct =</span> tft_ca_percent, <span class="co">#</span></a>
+<a class="sourceLine" id="cb3-9" data-line-number="9">      <span class="dt">tft_floc =</span> tft_floculante_g_ton, <span class="co"># ? Floculante en g/Ton</span></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10">      <span class="dt">sol_filt_pct =</span> percent_solidos_filtrado, <span class="co"># % de sólidos filtrados</span></a>
+<a class="sourceLine" id="cb3-11" data-line-number="11">      <span class="dt">sol_recep_pct =</span> percent_solidos_recep, <span class="co"># % de sólidos recibido</span></a>
+<a class="sourceLine" id="cb3-12" data-line-number="12">      <span class="dt">esf_corte =</span> esfuerzo_de_corte, <span class="co"># Esfuerzo de corte</span></a>
+<a class="sourceLine" id="cb3-13" data-line-number="13">      <span class="dt">tasa_filt =</span> tasa_kg_m2_hr, <span class="co"># Tasa de filtrado</span></a>
+<a class="sourceLine" id="cb3-14" data-line-number="14">      <span class="dt">Na_gpl =</span> sodio_mg_l, <span class="co"># Concentración de sodio en g/L</span></a>
+<a class="sourceLine" id="cb3-15" data-line-number="15">      <span class="dt">Cu_S_gpl =</span> cu_s_mg_l, <span class="co"># Concentración sulfuro de cobre en g/L</span></a>
+<a class="sourceLine" id="cb3-16" data-line-number="16">      <span class="dt">tft_visc =</span> tft_viscosidad, <span class="co"># tft Viscocidad</span></a>
+<a class="sourceLine" id="cb3-17" data-line-number="17">      <span class="dt">insol =</span> insoluble, <span class="co"># Cantidad de insolubles ???</span></a>
+<a class="sourceLine" id="cb3-18" data-line-number="18">      <span class="dt">temp =</span> temperatura <span class="co"># Temperatura</span></a>
+<a class="sourceLine" id="cb3-19" data-line-number="19">      )</a>
+<a class="sourceLine" id="cb3-20" data-line-number="20"></a>
+<a class="sourceLine" id="cb3-21" data-line-number="21">port<span class="op">$</span>na_count &lt;-<span class="st"> </span><span class="kw">apply</span>(port, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="kw">sum</span>(<span class="kw">is.na</span>(x)))</a>
+<a class="sourceLine" id="cb3-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb3-23" data-line-number="23"><span class="kw">dim</span>(port)</a>
+<a class="sourceLine" id="cb3-24" data-line-number="24"><span class="co"># [1] 582  20</span></a>
+<a class="sourceLine" id="cb3-25" data-line-number="25"><span class="kw">summary</span>(port)</a>
+<a class="sourceLine" id="cb3-26" data-line-number="26"><span class="co">#     hum_pct         tasa_filt        x10_pct          insol       </span></a>
+<a class="sourceLine" id="cb3-27" data-line-number="27"><span class="co">#  Min.   : 7.950   Min.   :410.0   Min.   : 0.00   Min.   : 0.000  </span></a>
+<a class="sourceLine" id="cb3-28" data-line-number="28"><span class="co">#  1st Qu.: 8.460   1st Qu.:534.5   1st Qu.:21.72   1st Qu.: 6.550  </span></a>
+<a class="sourceLine" id="cb3-29" data-line-number="29"><span class="co">#  Median : 8.670   Median :567.7   Median :23.01   Median : 7.590  </span></a>
+<a class="sourceLine" id="cb3-30" data-line-number="30"><span class="co">#  Mean   : 8.703   Mean   :570.2   Mean   :22.98   Mean   : 7.733  </span></a>
+<a class="sourceLine" id="cb3-31" data-line-number="31"><span class="co">#  3rd Qu.: 8.850   3rd Qu.:604.0   3rd Qu.:24.20   3rd Qu.: 8.850  </span></a>
+<a class="sourceLine" id="cb3-32" data-line-number="32"><span class="co">#  Max.   :10.080   Max.   :717.4   Max.   :28.63   Max.   :13.000  </span></a>
+<a class="sourceLine" id="cb3-33" data-line-number="33"><span class="co">#  NA&#39;s   :2        NA&#39;s   :2       NA&#39;s   :1       NA&#39;s   :1       </span></a>
+<a class="sourceLine" id="cb3-34" data-line-number="34"><span class="co">#      Na_gpl       sulfato_mg_l   cloruro_mg_l      conduct    </span></a>
+<a class="sourceLine" id="cb3-35" data-line-number="35"><span class="co">#  Min.   :157.0   Min.   : 459   Min.   : 57.0   Min.   : 901  </span></a>
+<a class="sourceLine" id="cb3-36" data-line-number="36"><span class="co">#  1st Qu.:487.5   1st Qu.:1534   1st Qu.:129.0   1st Qu.:2945  </span></a>
+<a class="sourceLine" id="cb3-37" data-line-number="37"><span class="co">#  Median :580.0   Median :1701   Median :154.0   Median :3490  </span></a>
+<a class="sourceLine" id="cb3-38" data-line-number="38"><span class="co">#  Mean   :565.4   Mean   :1714   Mean   :159.6   Mean   :3341  </span></a>
+<a class="sourceLine" id="cb3-39" data-line-number="39"><span class="co">#  3rd Qu.:650.5   3rd Qu.:1880   3rd Qu.:187.0   3rd Qu.:3870  </span></a>
+<a class="sourceLine" id="cb3-40" data-line-number="40"><span class="co">#  Max.   :863.0   Max.   :2709   Max.   :331.0   Max.   :4830  </span></a>
+<a class="sourceLine" id="cb3-41" data-line-number="41"><span class="co">#  NA&#39;s   :3       NA&#39;s   :3      NA&#39;s   :3       NA&#39;s   :3     </span></a>
+<a class="sourceLine" id="cb3-42" data-line-number="42"><span class="co">#        ph             cot            ca_ppm        tft_ca_pct    </span></a>
+<a class="sourceLine" id="cb3-43" data-line-number="43"><span class="co">#  Min.   : 6.25   Min.   : 0.00   Min.   : 24.0   Min.   :0.1000  </span></a>
+<a class="sourceLine" id="cb3-44" data-line-number="44"><span class="co">#  1st Qu.: 9.50   1st Qu.:10.00   1st Qu.:206.0   1st Qu.:0.2000  </span></a>
+<a class="sourceLine" id="cb3-45" data-line-number="45"><span class="co">#  Median :10.01   Median :14.50   Median :272.0   Median :0.2600  </span></a>
+<a class="sourceLine" id="cb3-46" data-line-number="46"><span class="co">#  Mean   :10.01   Mean   :15.52   Mean   :287.8   Mean   :0.2631  </span></a>
+<a class="sourceLine" id="cb3-47" data-line-number="47"><span class="co">#  3rd Qu.:10.65   3rd Qu.:19.50   3rd Qu.:338.0   3rd Qu.:0.3000  </span></a>
+<a class="sourceLine" id="cb3-48" data-line-number="48"><span class="co">#  Max.   :12.03   Max.   :62.00   Max.   :720.0   Max.   :0.7800  </span></a>
+<a class="sourceLine" id="cb3-49" data-line-number="49"><span class="co">#  NA&#39;s   :3       NA&#39;s   :34      NA&#39;s   :32      NA&#39;s   :161     </span></a>
+<a class="sourceLine" id="cb3-50" data-line-number="50"><span class="co">#     Cu_S_gpl         tft_visc         tft_floc      sol_filt_pct  </span></a>
+<a class="sourceLine" id="cb3-51" data-line-number="51"><span class="co">#  Min.   :0.0200   Min.   : 2.585   Min.   :0.581   Min.   :57.20  </span></a>
+<a class="sourceLine" id="cb3-52" data-line-number="52"><span class="co">#  1st Qu.:0.1100   1st Qu.: 5.440   1st Qu.:1.358   1st Qu.:61.55  </span></a>
+<a class="sourceLine" id="cb3-53" data-line-number="53"><span class="co">#  Median :0.1600   Median : 6.240   Median :1.741   Median :61.99  </span></a>
+<a class="sourceLine" id="cb3-54" data-line-number="54"><span class="co">#  Mean   :0.1972   Mean   : 6.329   Mean   :1.951   Mean   :62.15  </span></a>
+<a class="sourceLine" id="cb3-55" data-line-number="55"><span class="co">#  3rd Qu.:0.2400   3rd Qu.: 7.040   3rd Qu.:2.260   3rd Qu.:62.79  </span></a>
+<a class="sourceLine" id="cb3-56" data-line-number="56"><span class="co">#  Max.   :1.1700   Max.   :12.185   Max.   :8.678   Max.   :65.03  </span></a>
+<a class="sourceLine" id="cb3-57" data-line-number="57"><span class="co">#  NA&#39;s   :3        NA&#39;s   :1        NA&#39;s   :54      NA&#39;s   :4      </span></a>
+<a class="sourceLine" id="cb3-58" data-line-number="58"><span class="co">#  sol_recep_pct        temp         esf_corte         na_count     </span></a>
+<a class="sourceLine" id="cb3-59" data-line-number="59"><span class="co">#  Min.   :53.67   Min.   :17.90   Min.   : 2.508   Min.   : 0.000  </span></a>
+<a class="sourceLine" id="cb3-60" data-line-number="60"><span class="co">#  1st Qu.:61.62   1st Qu.:22.30   1st Qu.: 5.643   1st Qu.: 0.000  </span></a>
+<a class="sourceLine" id="cb3-61" data-line-number="61"><span class="co">#  Median :62.07   Median :25.20   Median : 7.059   Median : 1.000  </span></a>
+<a class="sourceLine" id="cb3-62" data-line-number="62"><span class="co">#  Mean   :61.97   Mean   :25.41   Mean   : 7.365   Mean   : 1.179  </span></a>
+<a class="sourceLine" id="cb3-63" data-line-number="63"><span class="co">#  3rd Qu.:62.42   3rd Qu.:28.60   3rd Qu.: 8.855   3rd Qu.: 2.000  </span></a>
+<a class="sourceLine" id="cb3-64" data-line-number="64"><span class="co">#  Max.   :64.34   Max.   :31.70   Max.   :15.763   Max.   :16.000  </span></a>
+<a class="sourceLine" id="cb3-65" data-line-number="65"><span class="co">#  NA&#39;s   :2       NA&#39;s   :61      NA&#39;s   :313</span></a></code></pre></div>
+</div>
+</div>
+<div id="data-engineering" class="section level1">
+<h1><span class="header-section-number">3</span> Data engineering</h1>
+<div id="check-variable-data-type" class="section level2">
+<h2><span class="header-section-number">3.1</span> Check variable data type</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># sapply(port, class)</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">categ_cols &lt;-<span class="st"> </span><span class="kw">names</span>(port[,<span class="kw">sapply</span>(port, is.character)])</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw">cat</span>(<span class="st">&#39;There are&#39;</span>, <span class="kw">length</span>(categ_cols), <span class="st">&#39;remaining columns with character values&#39;</span>)</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co"># There are 0 remaining columns with character values</span></a></code></pre></div>
+<p>Since categorical variables enter into statistical models differently than continuous variables, storing data as factors insures that the modeling functions will treat such data correctly. The code performs the following tasks: rename variable names, change data type to factor and order ordinal factors.</p>
+</div>
+</div>
+<div id="descriptive-statistics" class="section level1 tabset">
+<h1><span class="header-section-number">4</span> Descriptive statistics</h1>
+<p>Descriptive statistics describe quantitatively the basic features of the data. These statistics will give us a head start by providing information about stuff like skewness, outliers (range) missing data points and (near) zero variance.</p>
+<div id="data-profile" class="section level2">
+<h2><span class="header-section-number">4.1</span> Data profile</h2>
+<div id="htmlwidget-00858b541c14efa4a0a7" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-00858b541c14efa4a0a7">{"x":{"filter":"none","caption":"<caption>Descriptive statistics<\/caption>","data":[["hum_pct","tasa_filt","x10_pct","insol","Na_gpl","sulfato_mg_l","cloruro_mg_l","conduct","ph","cot","ca_ppm","tft_ca_pct","Cu_S_gpl","tft_visc","tft_floc","sol_filt_pct","sol_recep_pct","temp","esf_corte","na_count"],[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],[580,580,581,581,579,579,579,579,579,548,550,421,579,581,528,578,580,521,269,582],[8.7,570.15,22.98,7.73,565.36,1714.15,159.65,3340.83,10.01,15.52,287.79,0.26,0.2,6.33,1.95,62.15,61.97,25.41,7.37,1.18],[0.33,52.28,2.11,1.68,125.08,291.04,43.36,720.41,0.9,8.05,104.46,0.09,0.13,1.33,0.94,1,0.97,3.41,2.38,1.46],[8.67,567.69,23.01,7.59,580,1701,154,3490,10.01,14.5,272,0.26,0.16,6.24,1.74,61.99,62.07,25.2,7.06,1],[8.67,569.25,22.99,7.68,569.53,1706.44,157.16,3402.28,10.04,14.64,276.85,0.25,0.18,6.25,1.82,62.13,62.04,25.4,7.19,1.01],[0.3,50.12,1.9,1.7,120.09,253.52,43,637.52,0.83,6.97,97.85,0.06,0.09,1.19,0.66,0.85,0.58,4.6,2.32,1.48],[7.95,410.05,0,0,157,459,57,901,6.25,0,24,0.1,0.02,2.58,0.58,57.2,53.67,17.9,2.51,0],[10.08,717.41,28.63,13,863,2709,331,4830,12.03,62,720,0.78,1.17,12.18,8.68,65.03,64.34,31.7,15.76,16],[2.13,307.36,28.63,13,706,2250,274,3929,5.78,62,696,0.68,1.15,9.6,8.1,7.83,10.67,13.8,13.25,16],[0.96,0.14,-2.14,0.2,-0.35,0.15,0.65,-0.78,-0.41,1.75,0.99,2.23,2.21,0.6,2.4,0.04,-2.42,0.03,0.77,3.83],[1.49,-0.11,23,0.44,-0.23,1.03,0.63,0.33,0.55,6.02,1.18,8.38,7.74,0.72,9.66,0.8,14.21,-1.27,0.64,32.04],[0.01,2.17,0.09,0.07,5.2,12.1,1.8,29.94,0.04,0.34,4.45,0,0.01,0.06,0.04,0.04,0.04,0.15,0.15,0.06]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>vars<\/th>\n      <th>n<\/th>\n      <th>mean<\/th>\n      <th>sd<\/th>\n      <th>median<\/th>\n      <th>trimmed<\/th>\n      <th>mad<\/th>\n      <th>min<\/th>\n      <th>max<\/th>\n      <th>range<\/th>\n      <th>skew<\/th>\n      <th>kurtosis<\/th>\n      <th>se<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5,6,7,8,9,10,11,12,13]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="missing-values" class="section level1 tabset">
+<h1><span class="header-section-number">5</span> Missing values</h1>
+<div id="frequency" class="section level2">
+<h2><span class="header-section-number">5.1</span> Frequency</h2>
+<p>With this plot we can see that the variables that present the highest amount of missing data are: - <em>esfuerzo de corte</em> - <em>tft_ca_ppt</em> - <em>temp</em> - <em>tft_floc</em> - <em>cot</em> - <em>ca_ppm</em></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">gg_miss_var</span>(port)</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="missing-data-representated-geometrically" class="section level2">
+<h2><span class="header-section-number">5.2</span> Missing data representated geometrically</h2>
+<p>The variables mentiones above are represented graphycally to search for any pattern. In this graph, the data which is missing, is given a value of 10% less than the minimum value of the available data. Then, it’s represented in a dispersion graph were the red color represents the missing data.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb6-2" data-line-number="2">p1 &lt;-<span class="st"> </span>port <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-3" data-line-number="3"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> esf_corte, <span class="dt">y =</span> tasa_filt)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb6-4" data-line-number="4"><span class="st">  </span><span class="kw">geom_miss_point</span>()</a>
+<a class="sourceLine" id="cb6-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb6-6" data-line-number="6">p2 &lt;-<span class="st"> </span>port <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-7" data-line-number="7"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> tft_ca_pct, <span class="dt">y =</span> tasa_filt)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb6-8" data-line-number="8"><span class="st">  </span><span class="kw">geom_miss_point</span>()</a>
+<a class="sourceLine" id="cb6-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb6-10" data-line-number="10">p3 &lt;-<span class="st"> </span>port <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-11" data-line-number="11"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> temp, <span class="dt">y =</span> tasa_filt)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb6-12" data-line-number="12"><span class="st">  </span><span class="kw">geom_miss_point</span>()</a>
+<a class="sourceLine" id="cb6-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb6-14" data-line-number="14">p4 &lt;-<span class="st"> </span>port <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-15" data-line-number="15"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> cot, <span class="dt">y =</span> tasa_filt)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="st">  </span><span class="kw">geom_miss_point</span>()</a>
+<a class="sourceLine" id="cb6-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb6-18" data-line-number="18">p5 &lt;-<span class="st"> </span>port <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-19" data-line-number="19"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> ca_ppm, <span class="dt">y =</span> tasa_filt)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb6-20" data-line-number="20"><span class="st">  </span><span class="kw">geom_miss_point</span>()</a>
+<a class="sourceLine" id="cb6-21" data-line-number="21"></a>
+<a class="sourceLine" id="cb6-22" data-line-number="22">p6 &lt;-<span class="st"> </span>port <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb6-23" data-line-number="23"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="dt">x =</span> tft_floc, <span class="dt">y =</span> tasa_filt)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb6-24" data-line-number="24"><span class="st">  </span><span class="kw">geom_miss_point</span>()</a>
+<a class="sourceLine" id="cb6-25" data-line-number="25"></a>
+<a class="sourceLine" id="cb6-26" data-line-number="26">layout &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>), <span class="dv">3</span>, <span class="dv">2</span>,<span class="dt">byrow=</span><span class="ot">TRUE</span>)</a>
+<a class="sourceLine" id="cb6-27" data-line-number="27"><span class="kw">multiplot</span>(p1, p2, p3, p4, p5, p6, <span class="dt">layout=</span>layout)</a></code></pre></div>
+<div class="figure">
+<img src="figure/port.Rmd/unnamed-chunk-7-1.png" alt="Fig. 1" width="100%" />
+<p class="caption">
+Fig. 1
+</p>
+</div>
+<p>There is no insight in regards to any pattern correlated to the filter rate.</p>
+</div>
+<div id="more-information-about-missing-data-and-combinations." class="section level2">
+<h2><span class="header-section-number">5.3</span> More information about missing data and combinations.</h2>
+<p>In this part, we aim to answer the question: in which variables observations are missing, and how many? Aggregation plots are a useful tool for answering these questions. The one-liner below is all you need.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">aggr_plot &lt;-<span class="st"> </span><span class="kw">aggr</span>(port, <span class="dt">col=</span><span class="kw">c</span>(<span class="st">&#39;navyblue&#39;</span>,<span class="st">&#39;red&#39;</span>), <span class="dt">numbers=</span><span class="ot">TRUE</span>, <span class="dt">sortVars=</span><span class="ot">TRUE</span>, <span class="dt">labels=</span><span class="kw">names</span>(port), <span class="dt">cex.axis=</span>.<span class="dv">7</span>, <span class="dt">gap=</span><span class="dv">3</span>, <span class="dt">ylab=</span><span class="kw">c</span>(<span class="st">&quot;Histogram of missing data&quot;</span>,<span class="st">&quot;Pattern&quot;</span>))</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre><code># 
+#  Variables sorted by number of missings: 
+#       Variable       Count
+#      esf_corte 0.537800687
+#     tft_ca_pct 0.276632302
+#           temp 0.104810997
+#       tft_floc 0.092783505
+#            cot 0.058419244
+#         ca_ppm 0.054982818
+#   sol_filt_pct 0.006872852
+#         Na_gpl 0.005154639
+#   sulfato_mg_l 0.005154639
+#   cloruro_mg_l 0.005154639
+#        conduct 0.005154639
+#             ph 0.005154639
+#       Cu_S_gpl 0.005154639
+#        hum_pct 0.003436426
+#      tasa_filt 0.003436426
+#  sol_recep_pct 0.003436426
+#        x10_pct 0.001718213
+#          insol 0.001718213
+#       tft_visc 0.001718213
+#       na_count 0.000000000</code></pre>
+<p>It’s difficult to give any insight in regards to missing data.</p>
+</div>
+<div id="imputation" class="section level2">
+<h2><span class="header-section-number">5.4</span> Imputation</h2>
+<p>Finally, we decide to imputate the data. The technique used is Predictive Mean Matching (PAM) algorithm. Two data frames are generated, one with imputated data <em>df</em>, and the other one with only the rows that have no missing data <em>df_port</em>.</p>
+</div>
+</div>
+<div id="correlations-overview" class="section level1 tabset">
+<h1><span class="header-section-number">6</span> Correlations overview</h1>
+<p>After engineering new features and before starting the modelling, we will visualise the relations between our parameters using a <em>correlation matrix</em>. For this, we need to change all the input features into a numerical format. The visualisation uses the <em>corrplot</em> function from the eponymous package. <em>Corrplot</em> gives us great flexibility in manipulating the style of our plot.</p>
+<p>What we see below, are the colour-coded <em>correlation coefficients</em> for each combination of two features. In simplest terms: this shows whether two features are connected so that one changes with a predictable trend if you change the other. The closer this coefficient is to zero the weaker is the correlation. Both 1 and -1 are the ideal cases of perfect correlation and anti-correlation (dark blue and dark red in the plots below).</p>
+<p>Here, we are of course interested if and how strongly our features correlate with the <em>tasaDeFiltrado</em>, the prediction of which is the ultimate goal of this challenge. But we also want to know whether our potential predictors are <em>correlated among each other</em>, so that we can reduce the collinearity in our data set and improve the robustness of our prediction:</p>
+<div id="correlation-matrix-with-imputated-data." class="section level2">
+<h2><span class="header-section-number">6.1</span> Correlation matrix with imputated data.</h2>
+<p><img src="figure/port.Rmd/unnamed-chunk-10-1.png" width="1344" style="display: block; margin: auto;" /></p>
+<p>We find:</p>
+<ul>
+<li><em>Na_gpl</em> is correlated to <em>ph</em>, which is expected since sodium is a base and as concentration increase the pH must increase as well.</li>
+<li>As the amount of calcium which is given by <em>ca_ppm</em> and <em>tft_ca_pct</em> increases the <em>ph</em> is lowered. This is a similar behaviour when Acid runoff depletes the water’s alkalinity.</li>
+<li>The amount of missing data <em>na_count</em> decreases when the amount of <em>Na_gpl</em> increases. Somehow, with more sodium it’s more likely that more data is present. Inversly, when sodium levels decreases there is more missing data. Whe have no reponse as to which is the cause and which is the consequence of this behaviour. The analysis shown above is also applicable, but to a lesser extenct to <em>conductivity</em>. -The amount of missing data <em>na_count</em> increases as the amount of <em>ca_ppm</em> and <em>tft_ca_pct</em> increases.</li>
+</ul>
+</div>
+<div id="correlation-matrix-with-dropped-missing-data." class="section level2">
+<h2><span class="header-section-number">6.2</span> Correlation matrix with dropped missing data.</h2>
+<p><img src="figure/port.Rmd/unnamed-chunk-11-1.png" width="1344" style="display: block; margin: auto;" /></p>
+<p>Analyzing only the sampled data shows news observations, wich shouldn’t be expected. For instance, <em>Na_gpl</em> appears to be highly correlated to the <em>filtering rate</em> whilst this was not observed in the imputated data set.</p>
+<p>This is a tricky situation since we can’t give a good feedback on what’s going on. Why does the operator take some samples whilst in other he decides to omit? We ought to talk with the people in charge of the sample and do further analysis before we can giver an</p>
+</div>
+<div id="checking-for-outliers-in-the-data-set." class="section level2">
+<h2><span class="header-section-number">6.3</span> Checking for outliers in the data set.</h2>
+<p>The following plot is usefull to visualize the distribution of the data. We can see that <em>Na_gpl</em> has a high amount of points lower and higher than the 75% percentile.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">df.m &lt;-<span class="st"> </span>reshape2<span class="op">::</span><span class="kw">melt</span>(<span class="kw">log1p</span>(df_port), <span class="dt">id.vars =</span> <span class="ot">NULL</span>)</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="kw">library</span>(viridis)</a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co"># Loading required package: viridisLite</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4">df.m <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="st">  </span><span class="kw">ggplot</span>( <span class="kw">aes</span>(<span class="dt">x=</span>variable, <span class="dt">y=</span>value, <span class="dt">fill=</span>variable)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="st">    </span><span class="kw">geom_boxplot</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="st">    </span><span class="kw">scale_fill_viridis</span>(<span class="dt">discrete =</span> <span class="ot">TRUE</span>, <span class="dt">alpha=</span><span class="fl">0.6</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="st">    </span><span class="kw">geom_jitter</span>(<span class="dt">color=</span><span class="st">&quot;black&quot;</span>, <span class="dt">size=</span><span class="fl">0.4</span>, <span class="dt">alpha=</span><span class="fl">0.9</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="st">    </span><span class="kw">theme</span>(</a>
+<a class="sourceLine" id="cb9-10" data-line-number="10">      <span class="dt">legend.position=</span><span class="st">&quot;none&quot;</span>,</a>
+<a class="sourceLine" id="cb9-11" data-line-number="11">      <span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">20</span>),</a>
+<a class="sourceLine" id="cb9-12" data-line-number="12">      <span class="dt">axis.text=</span><span class="kw">element_text</span>(<span class="dt">size=</span><span class="dv">16</span>),</a>
+<a class="sourceLine" id="cb9-13" data-line-number="13">      <span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">45</span>),</a>
+<a class="sourceLine" id="cb9-14" data-line-number="14">    ) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-15" data-line-number="15"><span class="st">    </span><span class="kw">ggtitle</span>(<span class="st">&quot;Diagrama de cajas&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb9-16" data-line-number="16"><span class="st">    </span><span class="kw">xlab</span>(<span class="st">&quot;&quot;</span>)</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-12-1.png" width="1344" style="display: block; margin: auto;" /></p>
+<!-- ## Hierarchical clustering -->
+<!-- ```{python fig.width=14, fig.height=14} -->
+<!-- import pandas as pd -->
+<!-- import numpy as np -->
+<!-- import scipy as sp -->
+<!-- import scipy.stats -->
+<!-- from scipy.cluster import hierarchy as hc -->
+<!-- import matplotlib.pyplot as plt -->
+<!-- df = pd.read_csv("data/port/df_port.csv") -->
+<!-- df = df.drop(columns = ["Unnamed: 0", "na_count"]).reset_index(drop = True) -->
+<!-- corr = np.round(scipy.stats.spearmanr(df).correlation, 4) -->
+<!-- corr_condensed = hc.distance.squareform(1-corr) -->
+<!-- z = hc.linkage(corr_condensed, method='average') -->
+<!-- fig = plt.figure(figsize=(16,10)) -->
+<!-- dendrogram = hc.dendrogram(z, labels=df.columns, orientation='left', leaf_font_size=14) -->
+<!-- plt.show() -->
+<!-- ``` -->
+</div>
+</div>
+<div id="data-preparation" class="section level1 tabset">
+<h1><span class="header-section-number">7</span> Data preparation</h1>
+<div id="train-test-split" class="section level2">
+<h2><span class="header-section-number">7.1</span> Train Test split</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">dim</span>(df)</a>
+<a class="sourceLine" id="cb10-2" data-line-number="2"><span class="co"># [1] 582  20</span></a>
+<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co"># Pre-Processing of DataSet i.e. train : test split</span></a>
+<a class="sourceLine" id="cb10-4" data-line-number="4">tr_te_i &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(df<span class="op">$</span>target, <span class="dt">p =</span> <span class="fl">0.8</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb10-5" data-line-number="5">tr &lt;-<span class="st"> </span>df[tr_te_i,]</a>
+<a class="sourceLine" id="cb10-6" data-line-number="6">te &lt;-<span class="st"> </span>df[<span class="op">-</span>tr_te_i,]</a>
+<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="kw">dim</span>(tr)</a>
+<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co"># [1] 466  20</span></a>
+<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="kw">dim</span>(te)</a>
+<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co"># [1] 116  20</span></a></code></pre></div>
+</div>
+<div id="scaling-target-variable-imputated-data-set" class="section level2">
+<h2><span class="header-section-number">7.2</span> Scaling target variable (Imputated data set)</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">tri &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(tr)</a>
+<a class="sourceLine" id="cb11-2" data-line-number="2"><span class="co"># Check Normal distribution on target</span></a>
+<a class="sourceLine" id="cb11-3" data-line-number="3">tr<span class="op">$</span>target &lt;-<span class="st"> </span><span class="kw">log</span>(tr<span class="op">$</span>target)</a>
+<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="kw">qqnorm</span>(tr<span class="op">$</span>target)</a>
+<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="kw">qqline</span>(tr<span class="op">$</span>target)</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb12-2" data-line-number="2">te<span class="op">$</span>target &lt;-<span class="st"> </span><span class="kw">log</span>(te<span class="op">$</span>target)</a>
+<a class="sourceLine" id="cb12-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb12-4" data-line-number="4"><span class="co"># Unify Non Scaled train and test</span></a>
+<a class="sourceLine" id="cb12-5" data-line-number="5">tr_te &lt;-<span class="st"> </span>tr <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-6" data-line-number="6"><span class="st">  </span><span class="kw">bind_rows</span>(te) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb12-7" data-line-number="7"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span><span class="kw">c</span>(na_count))</a></code></pre></div>
+</div>
+<div id="scaling-target-variable-data-set-with-no-missing-values" class="section level2">
+<h2><span class="header-section-number">7.3</span> Scaling target variable (Data set with no missing values)</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="co"># Check Normal distribution on target</span></a>
+<a class="sourceLine" id="cb13-2" data-line-number="2">df_port<span class="op">$</span>target &lt;-<span class="st"> </span><span class="kw">log</span>(df_port<span class="op">$</span>target)</a>
+<a class="sourceLine" id="cb13-3" data-line-number="3"><span class="kw">qqnorm</span>(df_port<span class="op">$</span>target)</a>
+<a class="sourceLine" id="cb13-4" data-line-number="4"><span class="kw">qqline</span>(df_port<span class="op">$</span>target)</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="scaling-numerical-variables" class="section level2">
+<h2><span class="header-section-number">7.4</span> Scaling Numerical variables</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">num_var &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">sapply</span>(tr_te, is.numeric)) <span class="co">#index vector numeric variables</span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">num_varnames &lt;-<span class="st"> </span><span class="kw">names</span>(num_var) <span class="co">#saving names vector for use later on</span></a>
+<a class="sourceLine" id="cb14-3" data-line-number="3">num_varnames &lt;-<span class="st"> </span>num_varnames[<span class="op">!</span>(num_varnames <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;target&quot;</span>))]</a>
+<a class="sourceLine" id="cb14-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb14-5" data-line-number="5">df_num &lt;-<span class="st"> </span>tr_te[, <span class="kw">names</span>(tr_te) <span class="op">%in%</span><span class="st"> </span>num_varnames]</a>
+<a class="sourceLine" id="cb14-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb14-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb14-8" data-line-number="8"><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">ncol</span>(df_num)){</a>
+<a class="sourceLine" id="cb14-9" data-line-number="9">        <span class="cf">if</span> (<span class="kw">abs</span>(<span class="kw">skew</span>(df_num[,i]))<span class="op">&gt;</span><span class="fl">0.8</span>){</a>
+<a class="sourceLine" id="cb14-10" data-line-number="10">                df_num[,i] &lt;-<span class="st"> </span><span class="kw">log</span>(df_num[,i] <span class="op">+</span><span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb14-11" data-line-number="11">        }</a>
+<a class="sourceLine" id="cb14-12" data-line-number="12">}</a>
+<a class="sourceLine" id="cb14-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb14-14" data-line-number="14">pre_num &lt;-<span class="st"> </span><span class="kw">preProcess</span>(df_num, <span class="dt">method=</span><span class="kw">c</span>(<span class="st">&quot;center&quot;</span>, <span class="st">&quot;scale&quot;</span>))</a>
+<a class="sourceLine" id="cb14-15" data-line-number="15"><span class="kw">print</span>(pre_num)</a>
+<a class="sourceLine" id="cb14-16" data-line-number="16"><span class="co"># Created from 582 samples and 18 variables</span></a>
+<a class="sourceLine" id="cb14-17" data-line-number="17"><span class="co"># </span></a>
+<a class="sourceLine" id="cb14-18" data-line-number="18"><span class="co"># Pre-processing:</span></a>
+<a class="sourceLine" id="cb14-19" data-line-number="19"><span class="co">#   - centered (18)</span></a>
+<a class="sourceLine" id="cb14-20" data-line-number="20"><span class="co">#   - ignored (0)</span></a>
+<a class="sourceLine" id="cb14-21" data-line-number="21"><span class="co">#   - scaled (18)</span></a>
+<a class="sourceLine" id="cb14-22" data-line-number="22">df_norm &lt;-<span class="st"> </span><span class="kw">predict</span>(pre_num, df_num)</a></code></pre></div>
+</div>
+<div id="generating-train-and-test-data" class="section level2">
+<h2><span class="header-section-number">7.5</span> Generating train and test data</h2>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="co"># Unify both categorical and numerical.</span></a>
+<a class="sourceLine" id="cb15-2" data-line-number="2">train_test &lt;-<span class="st"> </span>df_norm</a>
+<a class="sourceLine" id="cb15-3" data-line-number="3"><span class="co"># With the original train split index, generate the data set.</span></a>
+<a class="sourceLine" id="cb15-4" data-line-number="4">train &lt;-<span class="st"> </span>train_test[tri,] <span class="co"># X_train</span></a>
+<a class="sourceLine" id="cb15-5" data-line-number="5">test &lt;-<span class="st"> </span>train_test[<span class="op">-</span>tri,] <span class="co"># X_test</span></a>
+<a class="sourceLine" id="cb15-6" data-line-number="6">y &lt;-<span class="st"> </span>tr<span class="op">$</span>target <span class="co"># X_train</span></a>
+<a class="sourceLine" id="cb15-7" data-line-number="7"><span class="co"># y_train &lt;- tr$target</span></a>
+<a class="sourceLine" id="cb15-8" data-line-number="8"><span class="co"># y_test &lt;- te$target</span></a>
+<a class="sourceLine" id="cb15-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb15-10" data-line-number="10"><span class="co"># write.csv(train, file = &quot;X_train.csv&quot;)</span></a>
+<a class="sourceLine" id="cb15-11" data-line-number="11"><span class="co"># write.csv(test, file = &quot;X_test.csv&quot;)</span></a>
+<a class="sourceLine" id="cb15-12" data-line-number="12"><span class="co"># write.csv(y, file = &quot;y_train.csv&quot;)</span></a>
+<a class="sourceLine" id="cb15-13" data-line-number="13"><span class="co"># write.csv(te$target, file = &quot;y_test.csv&quot;)</span></a></code></pre></div>
+</div>
+</div>
+<div id="machine-learning-model" class="section level1 tabset">
+<h1><span class="header-section-number">8</span> Machine learning model</h1>
+<div id="ensemble-extreme-gradient-boosting-ridge-regression" class="section level2">
+<h2><span class="header-section-number">8.1</span> Ensemble eXtreme Gradient Boosting + Ridge Regression</h2>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1">trControl &lt;-<span class="st"> </span><span class="kw">trainControl</span>(</a>
+<a class="sourceLine" id="cb16-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb16-3" data-line-number="3">        <span class="dt">method=</span><span class="st">&quot;cv&quot;</span>,</a>
+<a class="sourceLine" id="cb16-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb16-5" data-line-number="5">        <span class="dt">number=</span><span class="dv">7</span>,</a>
+<a class="sourceLine" id="cb16-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb16-7" data-line-number="7">        <span class="dt">savePredictions=</span><span class="st">&quot;all&quot;</span>,</a>
+<a class="sourceLine" id="cb16-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb16-9" data-line-number="9">        <span class="dt">index=</span><span class="kw">createResample</span>(tr<span class="op">$</span>target, <span class="dv">7</span>),  </a>
+<a class="sourceLine" id="cb16-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb16-11" data-line-number="11">        <span class="dt">allowParallel =</span> <span class="ot">TRUE</span></a>
+<a class="sourceLine" id="cb16-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb16-13" data-line-number="13">)</a>
+<a class="sourceLine" id="cb16-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb16-15" data-line-number="15">xgbTreeGrid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">nrounds =</span> <span class="dv">400</span>, <span class="dt">max_depth =</span> <span class="kw">seq</span>(<span class="dv">2</span>,<span class="dv">6</span>,<span class="dt">by =</span> <span class="dv">1</span>), <span class="dt">eta =</span> <span class="fl">0.1</span>, <span class="dt">gamma =</span> <span class="dv">0</span>, <span class="dt">colsample_bytree =</span> <span class="fl">1.0</span>,  <span class="dt">subsample =</span> <span class="fl">1.0</span>, <span class="dt">min_child_weight =</span> <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb16-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb16-17" data-line-number="17">glmnetGridElastic &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">.alpha =</span> <span class="fl">0.9</span>, <span class="dt">.lambda =</span> <span class="fl">0.009</span>) <span class="co">## notice the . before the parameter</span></a>
+<a class="sourceLine" id="cb16-18" data-line-number="18"></a>
+<a class="sourceLine" id="cb16-19" data-line-number="19">glmnetGridLasso &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">.alpha =</span> <span class="dv">1</span>, <span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="fl">0.001</span>,<span class="fl">0.1</span>,<span class="dt">by =</span> <span class="fl">0.001</span>))</a>
+<a class="sourceLine" id="cb16-20" data-line-number="20"></a>
+<a class="sourceLine" id="cb16-21" data-line-number="21">glmnetGridRidge &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">.alpha =</span> <span class="dv">0</span>, <span class="dt">.lambda =</span> <span class="kw">seq</span>(<span class="fl">0.001</span>,<span class="fl">0.1</span>,<span class="dt">by =</span> <span class="fl">0.001</span>))</a>
+<a class="sourceLine" id="cb16-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb16-23" data-line-number="23"><span class="kw">set.seed</span>(<span class="dv">333</span>)</a>
+<a class="sourceLine" id="cb16-24" data-line-number="24"></a>
+<a class="sourceLine" id="cb16-25" data-line-number="25">modelList &lt;&lt;-<span class="st"> </span><span class="kw">caretList</span>(</a>
+<a class="sourceLine" id="cb16-26" data-line-number="26"></a>
+<a class="sourceLine" id="cb16-27" data-line-number="27">                  <span class="dt">x =</span> <span class="kw">as.matrix</span>(train),</a>
+<a class="sourceLine" id="cb16-28" data-line-number="28"></a>
+<a class="sourceLine" id="cb16-29" data-line-number="29">                  <span class="dt">y =</span> tr<span class="op">$</span>target,</a>
+<a class="sourceLine" id="cb16-30" data-line-number="30"></a>
+<a class="sourceLine" id="cb16-31" data-line-number="31">                  <span class="dt">trControl=</span>trControl,</a>
+<a class="sourceLine" id="cb16-32" data-line-number="32"></a>
+<a class="sourceLine" id="cb16-33" data-line-number="33">                  <span class="dt">metric=</span><span class="st">&quot;RMSE&quot;</span>,</a>
+<a class="sourceLine" id="cb16-34" data-line-number="34"></a>
+<a class="sourceLine" id="cb16-35" data-line-number="35">                  <span class="dt">tuneList=</span><span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb16-36" data-line-number="36"></a>
+<a class="sourceLine" id="cb16-37" data-line-number="37">                  <span class="co">## Do not use custom names in list. Will give prediction error with greedy ensemble. Bug in caret.</span></a>
+<a class="sourceLine" id="cb16-38" data-line-number="38"></a>
+<a class="sourceLine" id="cb16-39" data-line-number="39">                          <span class="dt">xgbTree =</span> <span class="kw">caretModelSpec</span>(<span class="dt">method=</span><span class="st">&quot;xgbTree&quot;</span>,  <span class="dt">tuneGrid =</span> xgbTreeGrid, <span class="dt">nthread =</span> <span class="dv">8</span>),</a>
+<a class="sourceLine" id="cb16-40" data-line-number="40"></a>
+<a class="sourceLine" id="cb16-41" data-line-number="41">                          <span class="dt">glmnet=</span><span class="kw">caretModelSpec</span>(<span class="dt">method=</span><span class="st">&quot;glmnet&quot;</span>, <span class="dt">tuneGrid =</span> glmnetGridElastic), <span class="co">## Elastic, highly correlated with lasso and ridge regressions</span></a>
+<a class="sourceLine" id="cb16-42" data-line-number="42"><span class="co"># </span></a>
+<a class="sourceLine" id="cb16-43" data-line-number="43"><span class="co">#                           glmnet=caretModelSpec(method=&quot;glmnet&quot;, tuneGrid = glmnetGridLasso), ## Lasso</span></a>
+<a class="sourceLine" id="cb16-44" data-line-number="44"></a>
+<a class="sourceLine" id="cb16-45" data-line-number="45">                          <span class="dt">glmnet=</span><span class="kw">caretModelSpec</span>(<span class="dt">method=</span><span class="st">&quot;glmnet&quot;</span>, <span class="dt">tuneGrid =</span> glmnetGridRidge) <span class="co">## Ridge</span></a>
+<a class="sourceLine" id="cb16-46" data-line-number="46"></a>
+<a class="sourceLine" id="cb16-47" data-line-number="47">                          <span class="co">#svmLinear3= caretModelSpec(method=&quot;svmLinear3&quot;, tuneLenght = 20) ## SVM </span></a>
+<a class="sourceLine" id="cb16-48" data-line-number="48"></a>
+<a class="sourceLine" id="cb16-49" data-line-number="49">                          )</a>
+<a class="sourceLine" id="cb16-50" data-line-number="50"></a>
+<a class="sourceLine" id="cb16-51" data-line-number="51">)</a></code></pre></div>
+</div>
+<div id="correlation" class="section level2">
+<h2><span class="header-section-number">8.2</span> Correlation</h2>
+<pre><code>#            xgbTree    glmnet  glmnet.1
+# xgbTree  1.0000000 0.8155238 0.7828588
+# glmnet   0.8155238 1.0000000 0.9052348
+# glmnet.1 0.7828588 0.9052348 1.0000000</code></pre>
+</div>
+<div id="performance-summary" class="section level2">
+<h2><span class="header-section-number">8.3</span> Performance summary</h2>
+<pre><code># $RMSE
+#                Min.    1st Qu.     Median       Mean    3rd Qu.       Max.
+# xgbTree  0.06330538 0.06548392 0.06717139 0.06817997 0.06920201 0.07741116
+# glmnet   0.07242736 0.07840845 0.07941515 0.07962689 0.08113677 0.08645527
+# glmnet.1 0.06897974 0.07354095 0.07741870 0.07866448 0.08477519 0.08762063
+#          NA&#39;s
+# xgbTree     0
+# glmnet      0
+# glmnet.1    0
+# 
+# $Rsquared
+#               Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&#39;s
+# xgbTree  0.3809804 0.4155011 0.4727092 0.4511680 0.4836834 0.5061176    0
+# glmnet   0.1665313 0.2340235 0.2740467 0.2715755 0.3244529 0.3434975    0
+# glmnet.1 0.1229701 0.2110392 0.3034446 0.2960307 0.3969368 0.4298480    0</code></pre>
+</div>
+<div id="summary" class="section level2">
+<h2><span class="header-section-number">8.4</span> Summary</h2>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"></a>
+<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="kw">set.seed</span>(<span class="dv">333</span>)</a>
+<a class="sourceLine" id="cb19-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb19-4" data-line-number="4">greedyEnsemble &lt;-<span class="st"> </span><span class="kw">caretEnsemble</span>(</a>
+<a class="sourceLine" id="cb19-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb19-6" data-line-number="6">  modelList, </a>
+<a class="sourceLine" id="cb19-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb19-8" data-line-number="8">  <span class="dt">metric=</span><span class="st">&quot;RMSE&quot;</span>,</a>
+<a class="sourceLine" id="cb19-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb19-10" data-line-number="10">  <span class="dt">trControl=</span><span class="kw">trainControl</span>(</a>
+<a class="sourceLine" id="cb19-11" data-line-number="11"></a>
+<a class="sourceLine" id="cb19-12" data-line-number="12">    <span class="dt">number=</span><span class="dv">7</span>, <span class="dt">method =</span> <span class="st">&quot;cv&quot;</span></a>
+<a class="sourceLine" id="cb19-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb19-14" data-line-number="14">  ))</a>
+<a class="sourceLine" id="cb19-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb19-16" data-line-number="16"><span class="kw">summary</span>(greedyEnsemble)</a>
+<a class="sourceLine" id="cb19-17" data-line-number="17"><span class="co"># The following models were ensembled: xgbTree, glmnet, glmnet.1 </span></a>
+<a class="sourceLine" id="cb19-18" data-line-number="18"><span class="co"># They were weighted: </span></a>
+<a class="sourceLine" id="cb19-19" data-line-number="19"><span class="co"># -0.3852 0.8189 0.0774 0.1639</span></a>
+<a class="sourceLine" id="cb19-20" data-line-number="20"><span class="co"># The resulting RMSE is: 0.0681</span></a>
+<a class="sourceLine" id="cb19-21" data-line-number="21"><span class="co"># The fit for each individual model on the RMSE is: </span></a>
+<a class="sourceLine" id="cb19-22" data-line-number="22"><span class="co">#    method       RMSE      RMSESD</span></a>
+<a class="sourceLine" id="cb19-23" data-line-number="23"><span class="co">#   xgbTree 0.06817997 0.004673665</span></a>
+<a class="sourceLine" id="cb19-24" data-line-number="24"><span class="co">#    glmnet 0.07962689 0.004252056</span></a>
+<a class="sourceLine" id="cb19-25" data-line-number="25"><span class="co">#  glmnet.1 0.07866448 0.007164357</span></a></code></pre></div>
+</div>
+<div id="q-q-plot-residuals" class="section level2">
+<h2><span class="header-section-number">8.5</span> Q-Q plot residuals</h2>
+<p><img src="figure/port.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="feature-importance" class="section level1 tabset">
+<h1><span class="header-section-number">9</span> Feature importance</h1>
+<div id="ridge-regression" class="section level2">
+<h2><span class="header-section-number">9.1</span> Ridge regression</h2>
+<p><img src="figure/port.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="shap-xgb-with-optimal-parameters" class="section level2">
+<h2><span class="header-section-number">9.2</span> SHAP XGB with optimal parameters</h2>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="co"># modelList$xgbTree</span></a>
+<a class="sourceLine" id="cb20-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb20-3" data-line-number="3"><span class="co"># hyperparameter tuning results</span></a>
+<a class="sourceLine" id="cb20-4" data-line-number="4">X =<span class="st"> </span><span class="kw">select</span>(tr_te, <span class="op">-</span><span class="kw">c</span>(target))[tri,]</a>
+<a class="sourceLine" id="cb20-5" data-line-number="5">param_dart &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">objective =</span> <span class="st">&quot;reg:linear&quot;</span>,  <span class="co"># For regression</span></a>
+<a class="sourceLine" id="cb20-6" data-line-number="6">                   <span class="dt">nrounds =</span> <span class="dv">400</span>,</a>
+<a class="sourceLine" id="cb20-7" data-line-number="7">                   <span class="dt">max_depth =</span> <span class="dv">6</span>,</a>
+<a class="sourceLine" id="cb20-8" data-line-number="8">                   <span class="dt">eta =</span> <span class="fl">0.01</span>,</a>
+<a class="sourceLine" id="cb20-9" data-line-number="9">                   <span class="dt">gamma =</span> <span class="fl">0.00</span>,</a>
+<a class="sourceLine" id="cb20-10" data-line-number="10">                   <span class="dt">colsample_bytree =</span> <span class="dv">1</span>,</a>
+<a class="sourceLine" id="cb20-11" data-line-number="11">                   <span class="dt">min_child_weight =</span> <span class="dv">4</span>,</a>
+<a class="sourceLine" id="cb20-12" data-line-number="12">                   <span class="dt">subsample =</span> <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb20-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb20-14" data-line-number="14">mod &lt;-<span class="st"> </span>xgboost<span class="op">::</span><span class="kw">xgboost</span>(<span class="dt">data =</span> <span class="kw">as.matrix</span>(X), </a>
+<a class="sourceLine" id="cb20-15" data-line-number="15">                        <span class="dt">label =</span> <span class="kw">as.matrix</span>(tr<span class="op">$</span>target), </a>
+<a class="sourceLine" id="cb20-16" data-line-number="16">                       <span class="dt">xgb_param =</span> param_dart, <span class="dt">nrounds =</span> param_dart<span class="op">$</span>nrounds,</a>
+<a class="sourceLine" id="cb20-17" data-line-number="17">                       <span class="dt">verbose =</span> <span class="ot">FALSE</span>, <span class="dt">nthread =</span> parallel<span class="op">::</span><span class="kw">detectCores</span>() <span class="op">-</span><span class="st"> </span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb20-18" data-line-number="18">                       <span class="dt">early_stopping_rounds =</span> <span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb20-19" data-line-number="19"></a>
+<a class="sourceLine" id="cb20-20" data-line-number="20"></a>
+<a class="sourceLine" id="cb20-21" data-line-number="21">shap_values &lt;-<span class="st"> </span><span class="kw">shap.values</span>(<span class="dt">xgb_model =</span> mod, <span class="dt">X_train =</span> X)</a>
+<a class="sourceLine" id="cb20-22" data-line-number="22">shap_long &lt;-<span class="st"> </span><span class="kw">shap.prep</span>(<span class="dt">xgb_model =</span> mod, <span class="dt">X_train =</span> X)</a></code></pre></div>
+</div>
+<div id="plot" class="section level2">
+<h2><span class="header-section-number">9.3</span> Plot</h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">imp_matrix &lt;-<span class="st"> </span><span class="kw">as.tibble</span>(<span class="kw">xgb.importance</span>(<span class="dt">feature_names =</span> <span class="kw">colnames</span>(X), <span class="dt">model =</span> mod))</a>
+<a class="sourceLine" id="cb21-2" data-line-number="2"><span class="co"># Warning: `as.tibble()` is deprecated, use `as_tibble()` (but mind the new semantics).</span></a>
+<a class="sourceLine" id="cb21-3" data-line-number="3"><span class="co"># This warning is displayed once per session.</span></a>
+<a class="sourceLine" id="cb21-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb21-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb21-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb21-7" data-line-number="7">imp_matrix <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb21-8" data-line-number="8"></a>
+<a class="sourceLine" id="cb21-9" data-line-number="9"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="kw">reorder</span>(Feature, Gain, <span class="dt">FUN =</span> max), Gain, <span class="dt">fill =</span> Feature)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb21-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb21-11" data-line-number="11"><span class="st">  </span><span class="kw">geom_col</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb21-12" data-line-number="12"></a>
+<a class="sourceLine" id="cb21-13" data-line-number="13"><span class="st">  </span><span class="kw">coord_flip</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb21-14" data-line-number="14"></a>
+<a class="sourceLine" id="cb21-15" data-line-number="15"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb21-16" data-line-number="16"></a>
+<a class="sourceLine" id="cb21-17" data-line-number="17"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Features&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Importance&quot;</span>)</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">imp_matrix &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(shap_values<span class="op">$</span>mean_shap_score)</a>
+<a class="sourceLine" id="cb22-2" data-line-number="2"><span class="kw">rownames</span>(imp_matrix)</a>
+<a class="sourceLine" id="cb22-3" data-line-number="3"><span class="co">#  [1] &quot;temp&quot;          &quot;sol_filt_pct&quot;  &quot;conduct&quot;       &quot;sol_recep_pct&quot;</span></a>
+<a class="sourceLine" id="cb22-4" data-line-number="4"><span class="co">#  [5] &quot;Na_gpl&quot;        &quot;sulfato_mg_l&quot;  &quot;tft_visc&quot;      &quot;cot&quot;          </span></a>
+<a class="sourceLine" id="cb22-5" data-line-number="5"><span class="co">#  [9] &quot;x10_pct&quot;       &quot;hum_pct&quot;       &quot;ca_ppm&quot;        &quot;tft_floc&quot;     </span></a>
+<a class="sourceLine" id="cb22-6" data-line-number="6"><span class="co"># [13] &quot;insol&quot;         &quot;cloruro_mg_l&quot;  &quot;esf_corte&quot;     &quot;tft_ca_pct&quot;   </span></a>
+<a class="sourceLine" id="cb22-7" data-line-number="7"><span class="co"># [17] &quot;ph&quot;            &quot;Cu_S_gpl&quot;</span></a>
+<a class="sourceLine" id="cb22-8" data-line-number="8">imp_matrix &lt;-<span class="st"> </span><span class="kw">as.tibble</span>(<span class="kw">data.frame</span>(<span class="dt">Feature =</span> <span class="kw">row.names</span>(imp_matrix), <span class="dt">Importance =</span> imp_matrix))</a>
+<a class="sourceLine" id="cb22-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb22-10" data-line-number="10">imp_matrix</a>
+<a class="sourceLine" id="cb22-11" data-line-number="11"><span class="co"># # A tibble: 18 x 2</span></a>
+<a class="sourceLine" id="cb22-12" data-line-number="12"><span class="co">#    Feature       Importance</span></a>
+<a class="sourceLine" id="cb22-13" data-line-number="13"><span class="co">#    &lt;fct&gt;              &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb22-14" data-line-number="14"><span class="co">#  1 temp             0.0290 </span></a>
+<a class="sourceLine" id="cb22-15" data-line-number="15"><span class="co">#  2 sol_filt_pct     0.0157 </span></a>
+<a class="sourceLine" id="cb22-16" data-line-number="16"><span class="co">#  3 conduct          0.0145 </span></a>
+<a class="sourceLine" id="cb22-17" data-line-number="17"><span class="co">#  4 sol_recep_pct    0.0126 </span></a>
+<a class="sourceLine" id="cb22-18" data-line-number="18"><span class="co">#  5 Na_gpl           0.0103 </span></a>
+<a class="sourceLine" id="cb22-19" data-line-number="19"><span class="co">#  6 sulfato_mg_l     0.00863</span></a>
+<a class="sourceLine" id="cb22-20" data-line-number="20"><span class="co">#  7 tft_visc         0.00834</span></a>
+<a class="sourceLine" id="cb22-21" data-line-number="21"><span class="co">#  8 cot              0.00773</span></a>
+<a class="sourceLine" id="cb22-22" data-line-number="22"><span class="co">#  9 x10_pct          0.00703</span></a>
+<a class="sourceLine" id="cb22-23" data-line-number="23"><span class="co"># 10 hum_pct          0.00588</span></a>
+<a class="sourceLine" id="cb22-24" data-line-number="24"><span class="co"># 11 ca_ppm           0.00578</span></a>
+<a class="sourceLine" id="cb22-25" data-line-number="25"><span class="co"># 12 tft_floc         0.00515</span></a>
+<a class="sourceLine" id="cb22-26" data-line-number="26"><span class="co"># 13 insol            0.00509</span></a>
+<a class="sourceLine" id="cb22-27" data-line-number="27"><span class="co"># 14 cloruro_mg_l     0.00419</span></a>
+<a class="sourceLine" id="cb22-28" data-line-number="28"><span class="co"># 15 esf_corte        0.00339</span></a>
+<a class="sourceLine" id="cb22-29" data-line-number="29"><span class="co"># 16 tft_ca_pct       0.00273</span></a>
+<a class="sourceLine" id="cb22-30" data-line-number="30"><span class="co"># 17 ph               0.00246</span></a>
+<a class="sourceLine" id="cb22-31" data-line-number="31"><span class="co"># 18 Cu_S_gpl         0.00241</span></a>
+<a class="sourceLine" id="cb22-32" data-line-number="32">imp_matrix <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb22-33" data-line-number="33"></a>
+<a class="sourceLine" id="cb22-34" data-line-number="34"><span class="st">  </span><span class="kw">ggplot</span>(<span class="kw">aes</span>(<span class="kw">reorder</span>(Feature, Importance, <span class="dt">FUN =</span> max), Importance, <span class="dt">fill =</span> Feature)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-35" data-line-number="35"></a>
+<a class="sourceLine" id="cb22-36" data-line-number="36"><span class="st">  </span><span class="kw">geom_col</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-37" data-line-number="37"></a>
+<a class="sourceLine" id="cb22-38" data-line-number="38"><span class="st">  </span><span class="kw">coord_flip</span>() <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-39" data-line-number="39"></a>
+<a class="sourceLine" id="cb22-40" data-line-number="40"><span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb22-41" data-line-number="41"></a>
+<a class="sourceLine" id="cb22-42" data-line-number="42"><span class="st">  </span><span class="kw">labs</span>(<span class="dt">x =</span> <span class="st">&quot;Variables&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;Importancia relativa&quot;</span>)</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">shap_values<span class="op">$</span>mean_shap_score</a>
+<a class="sourceLine" id="cb23-2" data-line-number="2"><span class="co">#          temp  sol_filt_pct       conduct sol_recep_pct        Na_gpl </span></a>
+<a class="sourceLine" id="cb23-3" data-line-number="3"><span class="co">#   0.028976397   0.015692323   0.014545557   0.012552678   0.010283734 </span></a>
+<a class="sourceLine" id="cb23-4" data-line-number="4"><span class="co">#  sulfato_mg_l      tft_visc           cot       x10_pct       hum_pct </span></a>
+<a class="sourceLine" id="cb23-5" data-line-number="5"><span class="co">#   0.008626686   0.008341392   0.007728433   0.007027991   0.005878100 </span></a>
+<a class="sourceLine" id="cb23-6" data-line-number="6"><span class="co">#        ca_ppm      tft_floc         insol  cloruro_mg_l     esf_corte </span></a>
+<a class="sourceLine" id="cb23-7" data-line-number="7"><span class="co">#   0.005777914   0.005153675   0.005088682   0.004191773   0.003394108 </span></a>
+<a class="sourceLine" id="cb23-8" data-line-number="8"><span class="co">#    tft_ca_pct            ph      Cu_S_gpl </span></a>
+<a class="sourceLine" id="cb23-9" data-line-number="9"><span class="co">#   0.002729461   0.002461570   0.002412079</span></a></code></pre></div>
+</div>
+<div id="summary-plot" class="section level2">
+<h2><span class="header-section-number">9.4</span> Summary plot</h2>
+<p>The following plot shows the most important features, and their impact on the filtering rate.</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">shap.plot.summary.wrap2</span>(shap_values<span class="op">$</span>shap_score, <span class="kw">as.matrix</span>(X), <span class="dt">top_n =</span> <span class="dv">10</span>, <span class="dt">dilute =</span> <span class="dv">0</span>)</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-28-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="force-plot." class="section level2">
+<h2><span class="header-section-number">9.5</span> Force plot.</h2>
+<p>A SHAP force plot shows the contribution of the most important features divided by quantity.</p>
+<pre><code># The SHAP values of the Rest 14 features were summed into variable &#39;rest_variables&#39;.
+# Data has N = 466 | zoom in length is 50 at location 250.</code></pre>
+<p><img src="figure/port.Rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="importance-plot." class="section level2">
+<h2><span class="header-section-number">9.6</span> Importance plot.</h2>
+<p>The distribution of the real values agaisnt the contribution that they have on the filtering rate.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1">fig_list &lt;-<span class="st"> </span><span class="kw">lapply</span>(<span class="kw">names</span>(shap_values<span class="op">$</span>mean_shap_score)[<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>], </a>
+<a class="sourceLine" id="cb26-2" data-line-number="2">                   shap.plot.dependence, <span class="dt">data_long =</span> shap_long)</a>
+<a class="sourceLine" id="cb26-3" data-line-number="3">gridExtra<span class="op">::</span><span class="kw">grid.arrange</span>(<span class="dt">grobs =</span> fig_list, <span class="dt">ncol =</span> <span class="dv">2</span>)</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="between-variable-plots." class="section level2">
+<h2><span class="header-section-number">9.7</span> Between variable plots.</h2>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">shap_int &lt;-<span class="st"> </span><span class="kw">shap.prep.interaction</span>(<span class="dt">xgb_mod =</span> mod, <span class="dt">X_train =</span> <span class="kw">as.matrix</span>(X))</a>
+<a class="sourceLine" id="cb27-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb27-3" data-line-number="3">g3 &lt;-<span class="st"> </span><span class="kw">shap.plot.dependence</span>(<span class="dt">data_long =</span> shap_long,</a>
+<a class="sourceLine" id="cb27-4" data-line-number="4">                           <span class="dt">data_int =</span> shap_int,</a>
+<a class="sourceLine" id="cb27-5" data-line-number="5">                           <span class="dt">x=</span> <span class="st">&quot;temp&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;conduct&quot;</span>, </a>
+<a class="sourceLine" id="cb27-6" data-line-number="6">                           <span class="dt">color_feature =</span> <span class="st">&quot;conduct&quot;</span>)</a>
+<a class="sourceLine" id="cb27-7" data-line-number="7">g4 &lt;-<span class="st"> </span><span class="kw">shap.plot.dependence</span>(<span class="dt">data_long =</span> shap_long,</a>
+<a class="sourceLine" id="cb27-8" data-line-number="8">                           <span class="dt">data_int =</span> shap_int,</a>
+<a class="sourceLine" id="cb27-9" data-line-number="9">                           <span class="dt">x=</span> <span class="st">&quot;conduct&quot;</span>, <span class="dt">y =</span> <span class="st">&quot;sol_filt_pct&quot;</span>, </a>
+<a class="sourceLine" id="cb27-10" data-line-number="10">                           <span class="dt">color_feature =</span> <span class="st">&quot;sol_filt_pct&quot;</span>)</a>
+<a class="sourceLine" id="cb27-11" data-line-number="11">gridExtra<span class="op">::</span><span class="kw">grid.arrange</span>(g3, g4, <span class="dt">ncol=</span><span class="dv">2</span>)</a></code></pre></div>
+<p><img src="figure/port.Rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw">sessionInfo</span>()</a>
+<a class="sourceLine" id="cb28-2" data-line-number="2"><span class="co"># R version 3.5.2 (2018-12-20)</span></a>
+<a class="sourceLine" id="cb28-3" data-line-number="3"><span class="co"># Platform: x86_64-pc-linux-gnu (64-bit)</span></a>
+<a class="sourceLine" id="cb28-4" data-line-number="4"><span class="co"># Running under: Pop!_OS 19.04</span></a>
+<a class="sourceLine" id="cb28-5" data-line-number="5"><span class="co"># </span></a>
+<a class="sourceLine" id="cb28-6" data-line-number="6"><span class="co"># Matrix products: default</span></a>
+<a class="sourceLine" id="cb28-7" data-line-number="7"><span class="co"># BLAS: /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.8.0</span></a>
+<a class="sourceLine" id="cb28-8" data-line-number="8"><span class="co"># LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.8.0</span></a>
+<a class="sourceLine" id="cb28-9" data-line-number="9"><span class="co"># </span></a>
+<a class="sourceLine" id="cb28-10" data-line-number="10"><span class="co"># locale:</span></a>
+<a class="sourceLine" id="cb28-11" data-line-number="11"><span class="co">#  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              </span></a>
+<a class="sourceLine" id="cb28-12" data-line-number="12"><span class="co">#  [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    </span></a>
+<a class="sourceLine" id="cb28-13" data-line-number="13"><span class="co">#  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   </span></a>
+<a class="sourceLine" id="cb28-14" data-line-number="14"><span class="co">#  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 </span></a>
+<a class="sourceLine" id="cb28-15" data-line-number="15"><span class="co">#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span></a>
+<a class="sourceLine" id="cb28-16" data-line-number="16"><span class="co"># [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       </span></a>
+<a class="sourceLine" id="cb28-17" data-line-number="17"><span class="co"># </span></a>
+<a class="sourceLine" id="cb28-18" data-line-number="18"><span class="co"># attached base packages:</span></a>
+<a class="sourceLine" id="cb28-19" data-line-number="19"><span class="co"># [1] grid      stats     graphics  grDevices utils     datasets  methods  </span></a>
+<a class="sourceLine" id="cb28-20" data-line-number="20"><span class="co"># [8] base     </span></a>
+<a class="sourceLine" id="cb28-21" data-line-number="21"><span class="co"># </span></a>
+<a class="sourceLine" id="cb28-22" data-line-number="22"><span class="co"># other attached packages:</span></a>
+<a class="sourceLine" id="cb28-23" data-line-number="23"><span class="co">#  [1] viridis_0.5.1        viridisLite_0.3.0    lubridate_1.7.4     </span></a>
+<a class="sourceLine" id="cb28-24" data-line-number="24"><span class="co">#  [4] broom_0.5.2          mice_3.6.0           naniar_0.4.2        </span></a>
+<a class="sourceLine" id="cb28-25" data-line-number="25"><span class="co">#  [7] janitor_1.2.0        VIM_4.8.0            colorspace_1.4-1    </span></a>
+<a class="sourceLine" id="cb28-26" data-line-number="26"><span class="co"># [10] psych_1.8.12         caret_6.0-84         lattice_0.20-38     </span></a>
+<a class="sourceLine" id="cb28-27" data-line-number="27"><span class="co"># [13] tibble_2.1.3         data.table_1.12.2    dplyr_0.8.3         </span></a>
+<a class="sourceLine" id="cb28-28" data-line-number="28"><span class="co"># [16] here_0.1             DT_0.9               RColorBrewer_1.1-2  </span></a>
+<a class="sourceLine" id="cb28-29" data-line-number="29"><span class="co"># [19] corrplot_0.84        ggplot2_3.2.1        caretEnsemble_2.0.0 </span></a>
+<a class="sourceLine" id="cb28-30" data-line-number="30"><span class="co"># [22] glmnet_2.0-18        foreach_1.4.7        Matrix_1.2-15       </span></a>
+<a class="sourceLine" id="cb28-31" data-line-number="31"><span class="co"># [25] SHAPforxgboost_0.0.2 xgboost_0.90.0.2     reticulate_1.13     </span></a>
+<a class="sourceLine" id="cb28-32" data-line-number="32"><span class="co"># </span></a>
+<a class="sourceLine" id="cb28-33" data-line-number="33"><span class="co"># loaded via a namespace (and not attached):</span></a>
+<a class="sourceLine" id="cb28-34" data-line-number="34"><span class="co">#   [1] readxl_1.3.1       backports_1.1.4    workflowr_1.4.0   </span></a>
+<a class="sourceLine" id="cb28-35" data-line-number="35"><span class="co">#   [4] plyr_1.8.4         lazyeval_0.2.2     sp_1.3-1          </span></a>
+<a class="sourceLine" id="cb28-36" data-line-number="36"><span class="co">#   [7] splines_3.5.2      crosstalk_1.0.0    digest_0.6.21     </span></a>
+<a class="sourceLine" id="cb28-37" data-line-number="37"><span class="co">#  [10] htmltools_0.3.6    fansi_0.4.0        magrittr_1.5      </span></a>
+<a class="sourceLine" id="cb28-38" data-line-number="38"><span class="co">#  [13] checkmate_1.9.4    BBmisc_1.11        openxlsx_4.1.0.1  </span></a>
+<a class="sourceLine" id="cb28-39" data-line-number="39"><span class="co">#  [16] recipes_0.1.7      gower_0.2.1        haven_2.1.1       </span></a>
+<a class="sourceLine" id="cb28-40" data-line-number="40"><span class="co">#  [19] pan_1.6            xfun_0.9           crayon_1.3.4      </span></a>
+<a class="sourceLine" id="cb28-41" data-line-number="41"><span class="co">#  [22] jsonlite_1.6       lme4_1.1-21        zeallot_0.1.0     </span></a>
+<a class="sourceLine" id="cb28-42" data-line-number="42"><span class="co">#  [25] survival_2.43-3    zoo_1.8-6          iterators_1.0.12  </span></a>
+<a class="sourceLine" id="cb28-43" data-line-number="43"><span class="co">#  [28] glue_1.3.1         polyclip_1.10-0    gtable_0.3.0      </span></a>
+<a class="sourceLine" id="cb28-44" data-line-number="44"><span class="co">#  [31] ipred_0.9-9        car_3.0-3          DEoptimR_1.0-8    </span></a>
+<a class="sourceLine" id="cb28-45" data-line-number="45"><span class="co">#  [34] jomo_2.6-9         abind_1.4-5        scales_1.0.0      </span></a>
+<a class="sourceLine" id="cb28-46" data-line-number="46"><span class="co">#  [37] Rcpp_1.0.2         xtable_1.8-4       laeken_0.5.0      </span></a>
+<a class="sourceLine" id="cb28-47" data-line-number="47"><span class="co">#  [40] foreign_0.8-71     stats4_3.5.2       lava_1.6.6        </span></a>
+<a class="sourceLine" id="cb28-48" data-line-number="48"><span class="co">#  [43] prodlim_2018.04.18 vcd_1.4-4          htmlwidgets_1.3   </span></a>
+<a class="sourceLine" id="cb28-49" data-line-number="49"><span class="co">#  [46] ellipsis_0.3.0     pkgconfig_2.0.3    farver_1.1.0      </span></a>
+<a class="sourceLine" id="cb28-50" data-line-number="50"><span class="co">#  [49] nnet_7.3-12        utf8_1.1.4         tidyselect_0.2.5  </span></a>
+<a class="sourceLine" id="cb28-51" data-line-number="51"><span class="co">#  [52] labeling_0.3       rlang_0.4.0        reshape2_1.4.3    </span></a>
+<a class="sourceLine" id="cb28-52" data-line-number="52"><span class="co">#  [55] later_0.8.0        munsell_0.5.0      cellranger_1.1.0  </span></a>
+<a class="sourceLine" id="cb28-53" data-line-number="53"><span class="co">#  [58] tools_3.5.2        cli_1.1.0          generics_0.0.2    </span></a>
+<a class="sourceLine" id="cb28-54" data-line-number="54"><span class="co">#  [61] ranger_0.11.2      evaluate_0.14      stringr_1.4.0     </span></a>
+<a class="sourceLine" id="cb28-55" data-line-number="55"><span class="co">#  [64] yaml_2.2.0         ModelMetrics_1.2.2 knitr_1.25        </span></a>
+<a class="sourceLine" id="cb28-56" data-line-number="56"><span class="co">#  [67] fs_1.3.1           zip_2.0.4          robustbase_0.93-5 </span></a>
+<a class="sourceLine" id="cb28-57" data-line-number="57"><span class="co">#  [70] purrr_0.3.2        mitml_0.3-7        visdat_0.5.3      </span></a>
+<a class="sourceLine" id="cb28-58" data-line-number="58"><span class="co">#  [73] pbapply_1.4-2      nlme_3.1-137       whisker_0.4       </span></a>
+<a class="sourceLine" id="cb28-59" data-line-number="59"><span class="co">#  [76] mime_0.7           compiler_3.5.2     curl_4.2          </span></a>
+<a class="sourceLine" id="cb28-60" data-line-number="60"><span class="co">#  [79] e1071_1.7-2        ggsignif_0.6.0     tweenr_1.0.1      </span></a>
+<a class="sourceLine" id="cb28-61" data-line-number="61"><span class="co">#  [82] stringi_1.4.3      highr_0.8          forcats_0.4.0     </span></a>
+<a class="sourceLine" id="cb28-62" data-line-number="62"><span class="co">#  [85] nloptr_1.2.1       vctrs_0.2.0        pillar_1.4.2      </span></a>
+<a class="sourceLine" id="cb28-63" data-line-number="63"><span class="co">#  [88] lifecycle_0.1.0    lmtest_0.9-37      httpuv_1.5.2      </span></a>
+<a class="sourceLine" id="cb28-64" data-line-number="64"><span class="co">#  [91] R6_2.4.0           promises_1.0.1     gridExtra_2.3     </span></a>
+<a class="sourceLine" id="cb28-65" data-line-number="65"><span class="co">#  [94] rio_0.5.16         codetools_0.2-16   boot_1.3-20       </span></a>
+<a class="sourceLine" id="cb28-66" data-line-number="66"><span class="co">#  [97] MASS_7.3-51.1      assertthat_0.2.1   rprojroot_1.3-2   </span></a>
+<a class="sourceLine" id="cb28-67" data-line-number="67"><span class="co"># [100] withr_2.1.2        mnormt_1.5-5       parallel_3.5.2    </span></a>
+<a class="sourceLine" id="cb28-68" data-line-number="68"><span class="co"># [103] hms_0.5.1          rpart_4.1-13       timeDate_3043.102 </span></a>
+<a class="sourceLine" id="cb28-69" data-line-number="69"><span class="co"># [106] tidyr_1.0.0        class_7.3-15       minqa_1.2.4       </span></a>
+<a class="sourceLine" id="cb28-70" data-line-number="70"><span class="co"># [109] rmarkdown_1.15     snakecase_0.11.0   carData_3.0-2     </span></a>
+<a class="sourceLine" id="cb28-71" data-line-number="71"><span class="co"># [112] git2r_0.26.1       ggpubr_0.2.3       ggforce_0.3.1     </span></a>
+<a class="sourceLine" id="cb28-72" data-line-number="72"><span class="co"># [115] shiny_1.3.2</span></a></code></pre></div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

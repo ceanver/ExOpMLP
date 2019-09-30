@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Cecil V." />
+
+<meta name="date" content="2019-09-30" />
+
+<title>Excelencia Operacional Mina</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  { background-color: #f8f8f8; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ef2929; } /* Alert */
+code span.an { color: #8f5902; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #c4a000; } /* Attribute */
+code span.bn { color: #0000cf; } /* BaseN */
+code span.cf { color: #204a87; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4e9a06; } /* Char */
+code span.cn { color: #000000; } /* Constant */
+code span.co { color: #8f5902; font-style: italic; } /* Comment */
+code span.cv { color: #8f5902; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #8f5902; font-weight: bold; font-style: italic; } /* Documentation */
+code span.dt { color: #204a87; } /* DataType */
+code span.dv { color: #0000cf; } /* DecVal */
+code span.er { color: #a40000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #0000cf; } /* Float */
+code span.fu { color: #000000; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #8f5902; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #204a87; font-weight: bold; } /* Keyword */
+code span.op { color: #ce5c00; font-weight: bold; } /* Operator */
+code span.ot { color: #8f5902; } /* Other */
+code span.pp { color: #8f5902; font-style: italic; } /* Preprocessor */
+code span.sc { color: #000000; } /* SpecialChar */
+code span.ss { color: #4e9a06; } /* SpecialString */
+code span.st { color: #4e9a06; } /* String */
+code span.va { color: #000000; } /* Variable */
+code span.vs { color: #4e9a06; } /* VerbatimString */
+code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warning */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">ExOpMLP</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<div class="fluid-row" id="header">
+
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Excelencia Operacional Mina</h1>
+<h4 class="author">Cecil V.</h4>
+<h4 class="date">2019-09-30</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2019-09-30
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>ExOpMLP/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.4.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20190929code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20190929)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20190929code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20190929)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong13645bd"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> 13645bd </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrong13645bd" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    data/comminution/
+    Ignored:    data/mine/
+    Ignored:    data/port/
+    Ignored:    output/mine/
+
+Untracked files:
+    Untracked:  analysis/.gitignore
+    Untracked:  code/__pycache__/
+    Untracked:  code/utils_gps.py
+    Untracked:  code/utils_mine.py
+    Untracked:  docs/figure/
+    Untracked:  figure/
+
+Unstaged changes:
+    Modified:   .gitignore
+    Modified:   analysis/port.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the R Markdown and HTML files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view them.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+13645bd
+</td>
+<td>
+ceanver
+</td>
+<td>
+2019-09-30
+</td>
+<td>
+First Commit
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<style type="text/css">
+body{ /* Normal  */
+      font-size: 14px;
+  }
+td {  /* Table  */
+  font-size: 12px;
+}
+h1, .h1, h2, .h2, h3, .h3 {
+    margin-top: 10.5px;
+    margin-bottom: 10.5px;
+}
+h1.title {
+  font-size: 28px;
+  <!-- color: #7db956; -->
+}
+h1 { /* Header 1 */
+  font-size: 28px;
+  <!-- color: #3e4a52; -->
+}
+h2 { /* Header 2 */
+    font-size: 18px;
+  <!-- color: #3e4a52; -->
+}
+h3 { /* Header 3 */
+  font-size: 14px;
+  <!-- color: #3e4a52; -->
+}
+code.r{ /* Code block */
+    font-size: 12px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+th.sorting { /* DT column headers  */
+    text-align: left;
+}
+.nav>li>a { /* Tabs  */
+    <!-- color: #3e4a52; -->
+    font-size: 14px;
+    /* font-weight: bold; */
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+    <!-- color: #7db956; -->
+    }
+</style>
+<div id="introduction" class="section level1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<div id="objectives" class="section level2">
+<h2><span class="header-section-number">1.1</span> Objectives</h2>
+<ul>
+<li><p>Analizar y evaluar variables que afectan el tiempo de viaje en principales circuitos.</p></li>
+<li><p>Reproducción de escenario en áreas de interferencia/cuellos de botella/horarios específicos en donde se registra una baja en velocidad/productividad</p></li>
+<li><p>Estimar componentes del tiempo de viaje asociado a congestión, interferencias, intersecciones, curvas y condiciones particulares en tramos específicos.</p></li>
+<li><p>Evaluar su efecto y posible reducción.</p></li>
+<li><p>Evaluación del comportamiento de la variable ante escenarios particulares (invierno por ej.)</p></li>
+<li><p>Modelamiento matemático y Simulación ante distintas estrategias de operación y diseño: optimización de utilización/rendimiento, rutas libres, etc.</p></li>
+</ul>
+</div>
+</div>
+<div id="dependencies" class="section level1 tabset">
+<h1><span class="header-section-number">2</span> Dependencies</h1>
+<div id="required-libraries" class="section level2">
+<h2><span class="header-section-number">2.1</span> Required libraries</h2>
+</div>
+<div id="load-data" class="section level2 tabset">
+<h2><span class="header-section-number">2.2</span> Load data</h2>
+<div id="setup-python-imports" class="section level3">
+<h3><span class="header-section-number">2.2.1</span> Setup Python imports</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="im">import</span> sys</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">sys.path.append(<span class="bu">str</span>(r.DIR_PATH) <span class="op">+</span> <span class="st">&quot;/code&quot;</span>)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="im">from</span> utils_mine <span class="im">import</span> <span class="op">*</span></a>
+<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="im">from</span> utils_gps <span class="im">import</span> <span class="op">*</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="im">import</span> pandas <span class="im">as</span> pd</a></code></pre></div>
+<!-- ## Cleaning data -->
+<!-- ```{python} -->
+<!-- utils.mine.clean_data("2017 Transporte.xlsx", "2018 Transporte.xlsx", "2019 Transporte.xlsx") -->
+<!-- ``` -->
+<!-- ## Group gps data by trip -->
+<!-- ```{python GroupByTrip} -->
+<!-- ## Group by trip -->
+<!-- df_gps = pd.read_csv('data/gps_data.csv', sep = ',') -->
+<!-- print(f'gps_data.csv has {df_gps.shape[0]} rows and {df_gps.shape[1]} columns: =>') -->
+<!-- df_gps = df_gps.dropna(how = 'any') -->
+<!-- col_list = ['trip_id', 'Norte', 'Este','Cota', 'VelCalc', 'trip_freq', "origin", "destination"] -->
+<!-- df_list = group_trips(df_gps, col_list) -->
+<!-- df_traj, df_trip = df_list[0], df_list[1]  -->
+<!-- print(f'df_traj has {df_traj.shape[0]} rows and {df_traj.shape[1]} columns: =>') -->
+<!-- print(f'df_trip has {df_trip.shape[0]} rows and {df_trip.shape[1]} columns: =>') -->
+<!-- ``` -->
+<!-- ## Loading processed data to R {.tabset} -->
+<!-- <!-- ```{python} -->
+<p>–&gt; <!-- <!-- mine_data = pd.read_csv('data/caex_data.csv', sep = ',') --> –&gt;</p>
+<!-- <!-- df_dest = mine_data.copy() -->
+<p>–&gt; <!-- <!-- ######### Agregando rutas similares ######### --> –&gt; <!-- <!-- # df_dest['destination'] = df_dest['destination'].replace({'CH-02':'CH', 'CH-1':'CH', }) --> –&gt; <!-- <!-- ######### Agregando rutas similares ######### --> –&gt; <!-- <!-- df_dest['dest_count'] = 1  --> –&gt; <!-- <!-- dest = df_dest[['destination', 'dest_count']].groupby('destination', as_index=False).sum() --> –&gt; <!-- <!-- print("Number of actual routes:", len(dest)) --> –&gt; <!-- <!-- dest_ranks = np.argsort(-dest['dest_count']) --> –&gt; <!-- <!-- dest_top = dest.iloc[dest_ranks[:6]] --> –&gt; <!-- <!-- # df_train = df_train[df["days since"]  --> –&gt; <!-- <!-- # origins_top10 = origins_top10.rename(columns={'RUTA': 'ID', 'COUNT': 'Count'}) --> –&gt; <!-- <!-- # origins_top10 = origins_top10.merge(airport_codes, how='left', left_on='ID', right_on='Code') --> –&gt; <!-- <!-- del df_dest['dest_count'] --> –&gt; <!-- <!-- # display(dest_top) ##ONLY TAKE TOP 10 FOR NOW --> –&gt; <!-- <!-- list(dest_top["destination"]) --> –&gt; <!-- <!-- df_dest = df_dest[df_dest.destination.isin(list(dest_top["destination"]))].reset_index(drop=True) --> –&gt; <!-- <!-- # Prints the top 10, according to your calculation: --> –&gt;</p>
+<!-- <!-- df_orig = mine_data.copy() -->
+<p>–&gt; <!-- <!-- ######### Agregando rutas similares ######### --> –&gt; <!-- <!-- df_orig['origin'] = df_orig['origin'].replace({'F10N':'F10', 'F10E':'F10', 'F9SE':'F9', 'F9PD':'F9', 'F7R1': 'F7'}) --> –&gt; <!-- <!-- ######### Agregando rutas similares ######### --> –&gt; <!-- <!-- df_orig['orig_count'] = 1  --> –&gt; <!-- <!-- orig = df_orig[['origin', 'orig_count']].groupby('origin', as_index=False).sum() --> –&gt; <!-- <!-- print("Number of actual origins:", len(orig)) --> –&gt; <!-- <!-- orig_ranks = np.argsort(-orig['orig_count']) --> –&gt; <!-- <!-- orig_top = orig.iloc[orig_ranks[:4]] --> –&gt; <!-- <!-- del df_orig['orig_count'] --> –&gt; <!-- <!-- # display(orig_top) ##ONLY TAKE TOP 10 FOR NOW --> –&gt; <!-- <!-- list(orig_top["origin"]) --> –&gt; <!-- <!-- df_orig = df_orig[df_orig.origin.isin(list(orig_top["origin"]))].reset_index(drop=True) --> –&gt; <!-- <!-- # Prints the top 10, according to your calculation: --> –&gt;</p>
+<!-- <!-- df_route = df_orig[df_orig.origin.isin(list(orig_top["origin"]))].reset_index(drop=True) -->
+<p>–&gt; <!-- <!-- df_route = df_route[df_route.destination.isin(list(dest_top["destination"]))].reset_index(drop=True) --> –&gt; <!-- <!-- df_route["route"] = df_route["origin"] + "_" + df_route["destination"] --> –&gt; <!-- <!-- df_route['route_count'] = 1  --> –&gt; <!-- <!-- route = df_route[['route', 'route_count']].groupby('route', as_index=False).sum() --> –&gt; <!-- <!-- # print("Number of actual route:", len(route)) --> –&gt; <!-- <!-- route_ranks = np.argsort(-route['route_count']) --> –&gt; <!-- <!-- route_top = route.iloc[route_ranks[:8]].reset_index(drop = True) --> –&gt; <!-- <!-- del df_route['route_count'] --> –&gt; <!-- <!-- df_route = df_route[df_route.route.isin(list(route_top["route"]))].reset_index(drop=True) --> –&gt; <!-- <!-- ``` --> –&gt;</p>
+<!-- ```{r Loading data to R} -->
+<!-- mine <- as_tibble(fread("data/caex_data.csv")) %>%  -->
+<!--   filter(str_detect(date, "2019")) %>%  -->
+<!--   mutate(date = ymd(date)) -->
+<!-- tail(mine) -->
+<!-- summary(mine) -->
+<!-- str(mine) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- kpI_real <- mine %>%  -->
+<!--     filter(str_detect(route, "F10_chancado")) -->
+<!-- F7_chancado -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- unique(F7_chancado$origen_2) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- kpi_real <- mine %>%  -->
+<!--   # filter(str_detect(origen_2, "F10N-3440")) %>%  -->
+<!--   group_by(date) %>% -->
+<!--   summarise_if(is.numeric, mean, na.rm = TRUE) %>%  -->
+<!--   rename(daily_prod = tonelaje_fc) -->
+<!-- kpi_real -->
+<!--   # ggplot(aes(date, mean_tdV)) + -->
+<!--   # geom_line() + -->
+<!--   # # geom_smooth(method = "loess", color = "blue", span = 1/7) + -->
+<!--   # labs(y = "All visitors", x = "Date") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- kpi_real %>% -->
+<!--   # filter(visit_date > ymd("2016-04-15") & visit_date < ymd("2016-06-15")) %>% -->
+<!--   # group_by(visit_date) %>% -->
+<!--   # summarise(all_visitors = sum(visitors)) %>% -->
+<!--   ggplot(aes(date, daily_prod)) + -->
+<!--   geom_line() + -->
+<!--   geom_smooth(method = "loess", color = "blue", span = 1/7) + -->
+<!--   labs(y = "All visitors", x = "Date") -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- p1 <- train %>% -->
+<!--   ggplot(aes(trip_duration)) + -->
+<!--   geom_density(fill = "red", alpha = 0.5) + -->
+<!--   geom_density(aes(total_travel_time), fill = "blue", alpha = 0.5) + -->
+<!--   scale_x_log10() + -->
+<!--   coord_cartesian(xlim = c(5e1, 8e3)) -->
+<!-- p2 <- train %>% -->
+<!--   ggplot(aes(dist)) + -->
+<!--   geom_density(fill = "red", alpha = 0.5) + -->
+<!--   geom_density(aes(total_distance), fill = "blue", alpha = 0.5) + -->
+<!--   scale_x_log10() + -->
+<!--   coord_cartesian(xlim = c(2e2, 5e4)) -->
+<!-- p3 <- train %>% -->
+<!--   ggplot(aes(trip_duration, total_travel_time)) + -->
+<!--   geom_bin2d(bins = c(120,120)) + -->
+<!--   geom_abline(intercept = 0, slope = 1, colour = "red") + -->
+<!--   theme(legend.position = "none") -->
+<!-- p4 <- train %>% -->
+<!--   ggplot(aes(dist, total_distance)) + -->
+<!--   geom_bin2d(bins = c(70,70)) + -->
+<!--   geom_abline(intercept = 0, slope = 1, colour = "red") + -->
+<!--   theme(legend.position = "none") -->
+<!-- layout <- matrix(c(1,2,3,4),2,2,byrow=TRUE) -->
+<!-- multiplot(p1, p2, p3, p4, layout=layout) -->
+<!-- ``` -->
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">sessionInfo</span>()</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co"># R version 3.5.2 (2018-12-20)</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co"># Platform: x86_64-pc-linux-gnu (64-bit)</span></a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co"># Running under: Pop!_OS 19.04</span></a>
+<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co"># </span></a>
+<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co"># Matrix products: default</span></a>
+<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co"># BLAS: /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.8.0</span></a>
+<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="co"># LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.8.0</span></a>
+<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="co"># </span></a>
+<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="co"># locale:</span></a>
+<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="co">#  [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              </span></a>
+<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="co">#  [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    </span></a>
+<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="co">#  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   </span></a>
+<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="co">#  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 </span></a>
+<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="co">#  [9] LC_ADDRESS=C               LC_TELEPHONE=C            </span></a>
+<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co"># [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       </span></a>
+<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co"># </span></a>
+<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co"># attached base packages:</span></a>
+<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co"># [1] grid      stats     graphics  grDevices utils     datasets  methods  </span></a>
+<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co"># [8] base     </span></a>
+<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="co"># </span></a>
+<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="co"># other attached packages:</span></a>
+<a class="sourceLine" id="cb2-23" data-line-number="23"><span class="co">#  [1] lubridate_1.7.4      broom_0.5.2          mice_3.6.0          </span></a>
+<a class="sourceLine" id="cb2-24" data-line-number="24"><span class="co">#  [4] naniar_0.4.2         janitor_1.2.0        VIM_4.8.0           </span></a>
+<a class="sourceLine" id="cb2-25" data-line-number="25"><span class="co">#  [7] colorspace_1.4-1     psych_1.8.12         caret_6.0-84        </span></a>
+<a class="sourceLine" id="cb2-26" data-line-number="26"><span class="co"># [10] lattice_0.20-38      tibble_2.1.3         data.table_1.12.2   </span></a>
+<a class="sourceLine" id="cb2-27" data-line-number="27"><span class="co"># [13] dplyr_0.8.3          anomalize_0.2.0      tidyr_1.0.0         </span></a>
+<a class="sourceLine" id="cb2-28" data-line-number="28"><span class="co"># [16] here_0.1             DT_0.9               RColorBrewer_1.1-2  </span></a>
+<a class="sourceLine" id="cb2-29" data-line-number="29"><span class="co"># [19] corrplot_0.84        gridExtra_2.3        caretEnsemble_2.0.0 </span></a>
+<a class="sourceLine" id="cb2-30" data-line-number="30"><span class="co"># [22] glmnet_2.0-18        foreach_1.4.7        Matrix_1.2-15       </span></a>
+<a class="sourceLine" id="cb2-31" data-line-number="31"><span class="co"># [25] SHAPforxgboost_0.0.2 xgboost_0.90.0.2     reticulate_1.13     </span></a>
+<a class="sourceLine" id="cb2-32" data-line-number="32"><span class="co"># [28] GGally_1.4.0         tibbletime_0.1.3     plotly_4.9.0        </span></a>
+<a class="sourceLine" id="cb2-33" data-line-number="33"><span class="co"># [31] ggplot2_3.2.1        ggridges_0.5.1       ggthemes_4.2.0      </span></a>
+<a class="sourceLine" id="cb2-34" data-line-number="34"><span class="co"># </span></a>
+<a class="sourceLine" id="cb2-35" data-line-number="35"><span class="co"># loaded via a namespace (and not attached):</span></a>
+<a class="sourceLine" id="cb2-36" data-line-number="36"><span class="co">#   [1] readxl_1.3.1       backports_1.1.4    workflowr_1.4.0   </span></a>
+<a class="sourceLine" id="cb2-37" data-line-number="37"><span class="co">#   [4] plyr_1.8.4         lazyeval_0.2.2     sp_1.3-1          </span></a>
+<a class="sourceLine" id="cb2-38" data-line-number="38"><span class="co">#   [7] splines_3.5.2      digest_0.6.21      htmltools_0.3.6   </span></a>
+<a class="sourceLine" id="cb2-39" data-line-number="39"><span class="co">#  [10] magrittr_1.5       checkmate_1.9.4    BBmisc_1.11       </span></a>
+<a class="sourceLine" id="cb2-40" data-line-number="40"><span class="co">#  [13] openxlsx_4.1.0.1   recipes_0.1.7      gower_0.2.1       </span></a>
+<a class="sourceLine" id="cb2-41" data-line-number="41"><span class="co">#  [16] pan_1.6            haven_2.1.1        xfun_0.9          </span></a>
+<a class="sourceLine" id="cb2-42" data-line-number="42"><span class="co">#  [19] crayon_1.3.4       jsonlite_1.6       lme4_1.1-21       </span></a>
+<a class="sourceLine" id="cb2-43" data-line-number="43"><span class="co">#  [22] zeallot_0.1.0      survival_2.43-3    zoo_1.8-6         </span></a>
+<a class="sourceLine" id="cb2-44" data-line-number="44"><span class="co">#  [25] iterators_1.0.12   glue_1.3.1         polyclip_1.10-0   </span></a>
+<a class="sourceLine" id="cb2-45" data-line-number="45"><span class="co">#  [28] gtable_0.3.0       ipred_0.9-9        car_3.0-3         </span></a>
+<a class="sourceLine" id="cb2-46" data-line-number="46"><span class="co">#  [31] DEoptimR_1.0-8     jomo_2.6-9         abind_1.4-5       </span></a>
+<a class="sourceLine" id="cb2-47" data-line-number="47"><span class="co">#  [34] scales_1.0.0       Rcpp_1.0.2         viridisLite_0.3.0 </span></a>
+<a class="sourceLine" id="cb2-48" data-line-number="48"><span class="co">#  [37] laeken_0.5.0       foreign_0.8-71     stats4_3.5.2      </span></a>
+<a class="sourceLine" id="cb2-49" data-line-number="49"><span class="co">#  [40] lava_1.6.6         prodlim_2018.04.18 vcd_1.4-4         </span></a>
+<a class="sourceLine" id="cb2-50" data-line-number="50"><span class="co">#  [43] htmlwidgets_1.3    httr_1.4.1         pkgconfig_2.0.3   </span></a>
+<a class="sourceLine" id="cb2-51" data-line-number="51"><span class="co">#  [46] reshape_0.8.8      farver_1.1.0       nnet_7.3-12       </span></a>
+<a class="sourceLine" id="cb2-52" data-line-number="52"><span class="co">#  [49] tidyselect_0.2.5   rlang_0.4.0        reshape2_1.4.3    </span></a>
+<a class="sourceLine" id="cb2-53" data-line-number="53"><span class="co">#  [52] munsell_0.5.0      cellranger_1.1.0   tools_3.5.2       </span></a>
+<a class="sourceLine" id="cb2-54" data-line-number="54"><span class="co">#  [55] cli_1.1.0          generics_0.0.2     ranger_0.11.2     </span></a>
+<a class="sourceLine" id="cb2-55" data-line-number="55"><span class="co">#  [58] evaluate_0.14      stringr_1.4.0      yaml_2.2.0        </span></a>
+<a class="sourceLine" id="cb2-56" data-line-number="56"><span class="co">#  [61] ModelMetrics_1.2.2 knitr_1.25         fs_1.3.1          </span></a>
+<a class="sourceLine" id="cb2-57" data-line-number="57"><span class="co">#  [64] zip_2.0.4          robustbase_0.93-5  purrr_0.3.2       </span></a>
+<a class="sourceLine" id="cb2-58" data-line-number="58"><span class="co">#  [67] mitml_0.3-7        visdat_0.5.3       pbapply_1.4-2     </span></a>
+<a class="sourceLine" id="cb2-59" data-line-number="59"><span class="co">#  [70] nlme_3.1-137       whisker_0.4        compiler_3.5.2    </span></a>
+<a class="sourceLine" id="cb2-60" data-line-number="60"><span class="co">#  [73] rstudioapi_0.10    curl_4.2           e1071_1.7-2       </span></a>
+<a class="sourceLine" id="cb2-61" data-line-number="61"><span class="co">#  [76] ggsignif_0.6.0     tweenr_1.0.1       stringi_1.4.3     </span></a>
+<a class="sourceLine" id="cb2-62" data-line-number="62"><span class="co">#  [79] forcats_0.4.0      nloptr_1.2.1       vctrs_0.2.0       </span></a>
+<a class="sourceLine" id="cb2-63" data-line-number="63"><span class="co">#  [82] pillar_1.4.2       lifecycle_0.1.0    lmtest_0.9-37     </span></a>
+<a class="sourceLine" id="cb2-64" data-line-number="64"><span class="co">#  [85] R6_2.4.0           rio_0.5.16         codetools_0.2-16  </span></a>
+<a class="sourceLine" id="cb2-65" data-line-number="65"><span class="co">#  [88] boot_1.3-20        MASS_7.3-51.1      assertthat_0.2.1  </span></a>
+<a class="sourceLine" id="cb2-66" data-line-number="66"><span class="co">#  [91] rprojroot_1.3-2    withr_2.1.2        mnormt_1.5-5      </span></a>
+<a class="sourceLine" id="cb2-67" data-line-number="67"><span class="co">#  [94] parallel_3.5.2     hms_0.5.1          rpart_4.1-13      </span></a>
+<a class="sourceLine" id="cb2-68" data-line-number="68"><span class="co">#  [97] timeDate_3043.102  class_7.3-15       minqa_1.2.4       </span></a>
+<a class="sourceLine" id="cb2-69" data-line-number="69"><span class="co"># [100] rmarkdown_1.15     carData_3.0-2      git2r_0.26.1      </span></a>
+<a class="sourceLine" id="cb2-70" data-line-number="70"><span class="co"># [103] ggpubr_0.2.3       ggforce_0.3.1</span></a></code></pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
