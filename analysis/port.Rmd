@@ -1,0 +1,718 @@
+---
+title: "Excelencia Operacional Puerto"
+author: "Cecil V."
+date: '`r Sys.Date()`'
+output:
+  workflowr::wflow_html: 
+    theme: flatly
+    number_sections: true
+    toc: true
+    code_folding: hide
+    highlight: tango
+# runtime: shiny 
+---
+# Introduction
+
+The goal of this project is to provide an insight of what are the main features that affect the filtering rate at port. Additionally, we aim to construct a predictive model that will be able to give an accurate result for the filtering rate beforehand.
+
+# Dependencies {.tabset}
+
+## Required libraries
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(comment = "#", collapse = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+# General functions and models #
+library(reticulate) # python
+library(xgboost) # 
+library(SHAPforxgboost)
+library(glmnet)
+require(caretEnsemble) # ensemble modelling
+
+# general visualisation #
+library(ggplot2) # visualisation
+library(grid) # visualisation
+library(corrplot) # correlation plot matrix
+library(RColorBrewer) # Colours
+require(DT) # display data in html tables
+
+library(here)
+
+
+# general data manipulation #
+library(dplyr) # data manipulation
+library(data.table) # data manipulation
+library(tibble) # data wrangling
+library(caret) # Clasiffication And Regression Training
+library(psych) # skew
+
+library(VIM)
+# specific visualisation #
+
+# specific data manipulation #
+library(janitor) # clean headers
+library(naniar) # missing data
+library(mice) # Imputation
+library(broom)
+
+library(lubridate)
+# Date plus forecast
+
+## Helper functions 
+```
+
+```{r meesage=FALSE}
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  plots <- c(list(...), plotlist)
+  numPlots = length(plots)
+  if (is.null(layout)) {
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+ if (numPlots==1) {
+    print(plots[[1]])
+  } else {
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    for (i in 1:numPlots) {
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+
+## Load data to py
+
+```{python}
+import os
+import pandas as pd
+import numpy as np
+df_port = pd.read_excel('data/port/Data Diaria 2018 2019.xlsx', usecols = 'B:U')
+
+df_port.rename(columns = {'Día Operacional': 'date'}, inplace=True)
+df_port = df_port.drop(columns = ["date"])
+# df_port['date'] = pd.to_datetime(df_port['date'])
+# df_port = df_port.set_index('date')
+
+# display(set(df_filtering.loc[~df_filtering["pH"].astype(str).str.isdigit(), "pH"].tolist())) 
+
+df_port = df_port.replace('S/O', np.nan) ## missing value string
+df_port = df_port.replace({',': '.'}, regex=True)
+df_port['COT'] = df_port['COT'].replace('< 0.1', 0)
+df_port = df_port.dropna(how = 'all')
+# df_port = df_port.apply(pd.to_numeric)
+# df_port.fillna(df_port.mean(), inplace = True)
+          
+df_port.to_csv("data/port/df_port.csv", index = False)
+```
+
+## Load data to R
+
+```{r}
+port <- as_tibble(fread("data/port/df_port.csv"))
+port <- port %>%
+  clean_names(., "snake") %>% 
+  rename(
+      hum_pct = humedad_percent, # % de humedad
+      x10_pct = x10_number_percent, 
+      ph = p_h, # PH
+      tft_ca_pct = tft_ca_percent, #
+      tft_floc = tft_floculante_g_ton, # ? Floculante en g/Ton
+      sol_filt_pct = percent_solidos_filtrado, # % de sólidos filtrados
+      sol_recep_pct = percent_solidos_recep, # % de sólidos recibido
+      esf_corte = esfuerzo_de_corte, # Esfuerzo de corte
+      tasa_filt = tasa_kg_m2_hr, # Tasa de filtrado
+      Na_gpl = sodio_mg_l, # Concentración de sodio en g/L
+      Cu_S_gpl = cu_s_mg_l, # Concentración sulfuro de cobre en g/L
+      tft_visc = tft_viscosidad, # tft Viscocidad
+      insol = insoluble, # Cantidad de insolubles ???
+      temp = temperatura # Temperatura
+      )
+
+port$na_count <- apply(port, 1, function(x) sum(is.na(x)))
+
+dim(port)
+summary(port)
+```
+
+# Data engineering
+
+## Check variable data type
+```{r}
+# sapply(port, class)
+categ_cols <- names(port[,sapply(port, is.character)])
+cat('There are', length(categ_cols), 'remaining columns with character values')
+```
+
+Since categorical variables enter into statistical models differently than continuous variables, storing data as factors insures that the modeling functions will treat such data correctly. The code performs the following tasks: rename variable names, change data type to factor and order ordinal factors. 
+
+
+# Descriptive statistics {.tabset}
+
+Descriptive statistics describe quantitatively the basic features of the data. These statistics will give us a head start by providing information about stuff like skewness, outliers (range) missing data points and (near) zero variance.
+
+## Data profile
+
+```{r echo=FALSE}
+descStats <- describe(port) 
+
+datatable(round(descStats,2), rownames = T,
+
+          caption = "Descriptive statistics", 
+
+          options = list(pageLength = 8)) ## Interactive HTML table
+```
+
+# Missing values {.tabset}
+
+## Frequency
+
+With this plot we can see that the variables that present the highest amount of missing data are:
+- *esfuerzo de corte* 
+- *tft_ca_ppt*
+- *temp*
+- *tft_floc*
+- *cot*
+- *ca_ppm*
+
+```{r}
+gg_miss_var(port)
+```
+
+## Missing data representated geometrically
+
+The variables mentiones above are represented graphycally to search for any pattern. In this graph, the data which is missing, is given a value of 10% less than the minimum value of the available data. Then, it's represented in a dispersion graph were the red color represents the missing data.
+
+```{r split=FALSE, fig.align = 'default', warning = FALSE, fig.cap ="Fig. 1", out.width="100%"}
+
+p1 <- port %>%
+  ggplot(aes(x = esf_corte, y = tasa_filt)) +
+  geom_miss_point()
+
+p2 <- port %>%
+  ggplot(aes(x = tft_ca_pct, y = tasa_filt)) +
+  geom_miss_point()
+
+p3 <- port %>%
+  ggplot(aes(x = temp, y = tasa_filt)) +
+  geom_miss_point()
+
+p4 <- port %>%
+  ggplot(aes(x = cot, y = tasa_filt)) +
+  geom_miss_point()
+
+p5 <- port %>%
+  ggplot(aes(x = ca_ppm, y = tasa_filt)) +
+  geom_miss_point()
+
+p6 <- port %>%
+  ggplot(aes(x = tft_floc, y = tasa_filt)) +
+  geom_miss_point()
+
+layout <- matrix(c(1,2,3,4,5,6), 3, 2,byrow=TRUE)
+multiplot(p1, p2, p3, p4, p5, p6, layout=layout)
+```
+
+There is no insight in regards to any pattern correlated to the filter rate. 
+
+## More information about missing data and combinations.
+
+In this part, we aim to answer the question: in which variables observations are missing, and how many? Aggregation plots are a useful tool for answering these questions. The one-liner below is all you need.
+
+```{r}
+aggr_plot <- aggr(port, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(port), cex.axis=.7, gap=3, ylab=c("Histogram of missing data","Pattern"))
+```
+
+It's difficult to give any insight in regards to missing data.
+
+## Imputation
+
+Finally, we decide to imputate the data. The technique used is Predictive Mean Matching (PAM) algorithm. Two data frames are generated, one with imputated data *df*, and the other one with only the rows that have no missing data *df_port*.
+
+```{r include=FALSE}
+imp <- port %>% 
+  mice(m = 5, maxit = 50, meth = 'pmm', seed = 500, trace = FALSE)
+
+#We rename de port to data now. Filter rate is converted to target.
+
+df <- complete(imp, 3) %>%
+  rename(target = tasa_filt)
+
+df_port <- na.omit(port) %>%
+  rename(target = tasa_filt) %>% 
+  select(-c(na_count))
+```
+
+
+# Correlations overview{.tabset}
+
+After engineering new features and before starting the modelling, we will visualise the relations between our parameters using a *correlation matrix*. For this, we need to change all the input features into a numerical format. The visualisation uses the *corrplot* function from the eponymous package. *Corrplot* gives us great flexibility in manipulating the style of our plot.
+
+What we see below, are the colour-coded *correlation coefficients* for each combination of two features. In simplest terms: this shows whether two features are connected so that one changes with a predictable trend if you change the other. The closer this coefficient is to zero the weaker is the correlation. Both 1 and -1 are the ideal cases of perfect correlation and anti-correlation (dark blue and dark red in the plots below).
+
+Here, we are of course interested if and how strongly our features correlate with the *tasaDeFiltrado*, the prediction of which is the ultimate goal of this challenge. But we also want to know whether our potential predictors are *correlated among each other*, so that we can reduce the collinearity in our data set and improve the robustness of our prediction:
+
+## Correlation matrix with imputated data.
+
+```{r echo=FALSE, fig.width=14, fig.height=14}
+
+cor_M <- cor(df)
+
+## plot correlation
+cor.mtest <- function(mat, ...) {
+    mat <- as.matrix(mat)
+    n <- ncol(mat)
+    p.mat<- matrix(NA, n, n)
+    diag(p.mat) <- 0
+    for (i in 1:(n - 1)) {
+        for (j in (i + 1):n) {
+            tmp <- cor.test(mat[, i], mat[, j], ...)
+            p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+        }
+    }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+
+p.mat <- cor.mtest(df)
+
+
+corrplot(cor_M, 
+         title = "", 
+         type = "lower", 
+         order = "hclust",
+         hclust.method = "centroid",
+         tl.cex = 2,
+         tl.col = "black",
+         tl.srt = 45, 
+         p.mat = p.mat, 
+         sig.level = 0.01,
+         insig = "blank",
+         col=brewer.pal(n=8, name="PuOr"))
+```
+
+We find:
+
+- *Na_gpl* is correlated to *ph*, which is expected since sodium is a base and as concentration increase the pH must increase as well. 
+- As the amount of calcium which is given by *ca_ppm* and *tft_ca_pct* increases the *ph* is lowered. This is a similar behaviour when Acid runoff depletes the water's alkalinity.
+- The amount of missing data *na_count* decreases when the amount of *Na_gpl* increases. Somehow, with more sodium it's more likely that more data is present. Inversly, when sodium levels decreases there is more missing data. Whe have no reponse as to which is the cause and which is the consequence of this behaviour. The analysis shown above is also applicable, but to a lesser extenct to *conductivity*.
+-The amount of missing data *na_count* increases as the amount of *ca_ppm* and *tft_ca_pct* increases.
+
+## Correlation matrix with dropped missing data.
+
+```{r echo=FALSE, fig.width=14, fig.height=14}
+
+cor_M <- cor(df_port)
+
+## plot correlation
+cor.mtest <- function(mat, ...) {
+    mat <- as.matrix(mat)
+    n <- ncol(mat)
+    p.mat<- matrix(NA, n, n)
+    diag(p.mat) <- 0
+    for (i in 1:(n - 1)) {
+        for (j in (i + 1):n) {
+            tmp <- cor.test(mat[, i], mat[, j], ...)
+            p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+        }
+    }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+
+p.mat <- cor.mtest(df_port)
+
+
+corrplot(cor_M, 
+         title = "", 
+         type = "lower", 
+         order = "hclust",
+         hclust.method = "centroid",
+         tl.cex = 0.8,
+         tl.col = "black",
+         tl.srt = 45, 
+         p.mat = p.mat, 
+         sig.level = 0.01,
+         insig = "blank",
+         col=brewer.pal(n=8, name="PuOr"))
+```
+
+Analyzing only the sampled data shows news observations, wich shouldn't be expected. For instance, *Na_gpl* appears to be highly correlated to the *filtering rate* whilst this was not observed in the imputated data set.
+
+This is a tricky situation since we can't give a good feedback on what's going on. Why does the operator take some samples whilst in other he decides to omit? We ought to talk with the people in charge of the sample and do further analysis before we can giver an 
+
+
+## Checking for outliers in the data set.
+
+The following plot is usefull to visualize the distribution of the data. We can see that *Na_gpl* has a high amount of points lower and higher than the 75% percentile.
+
+```{r fig.width=14, fig.height=14}
+df.m <- reshape2::melt(log1p(df_port), id.vars = NULL)
+library(viridis)
+df.m %>%
+  ggplot( aes(x=variable, y=value, fill=variable)) +
+    geom_boxplot() +
+    scale_fill_viridis(discrete = TRUE, alpha=0.6) +
+    geom_jitter(color="black", size=0.4, alpha=0.9) +
+    theme(
+      legend.position="none",
+      plot.title = element_text(size=20),
+      axis.text=element_text(size=16),
+      axis.text.x = element_text(angle = 45),
+    ) +
+    ggtitle("Diagrama de cajas") +
+    xlab("")
+```
+  
+<!-- ## Hierarchical clustering -->
+<!-- ```{python fig.width=14, fig.height=14} -->
+<!-- import pandas as pd -->
+<!-- import numpy as np -->
+<!-- import scipy as sp -->
+<!-- import scipy.stats -->
+<!-- from scipy.cluster import hierarchy as hc -->
+<!-- import matplotlib.pyplot as plt -->
+<!-- df = pd.read_csv("data/port/df_port.csv") -->
+<!-- df = df.drop(columns = ["Unnamed: 0", "na_count"]).reset_index(drop = True) -->
+<!-- corr = np.round(scipy.stats.spearmanr(df).correlation, 4) -->
+<!-- corr_condensed = hc.distance.squareform(1-corr) -->
+<!-- z = hc.linkage(corr_condensed, method='average') -->
+<!-- fig = plt.figure(figsize=(16,10)) -->
+<!-- dendrogram = hc.dendrogram(z, labels=df.columns, orientation='left', leaf_font_size=14) -->
+<!-- plt.show() -->
+<!-- ``` -->
+
+# Data preparation {.tabset}
+
+## Train Test split
+
+```{r}
+dim(df)
+# Pre-Processing of DataSet i.e. train : test split
+tr_te_i <- createDataPartition(df$target, p = 0.8, list = FALSE)
+tr <- df[tr_te_i,]
+te <- df[-tr_te_i,]
+dim(tr)
+dim(te)
+```
+
+
+## Scaling target variable (Imputated data set)
+
+```{r}
+tri <- 1:nrow(tr)
+# Check Normal distribution on target
+tr$target <- log(tr$target)
+qqnorm(tr$target)
+qqline(tr$target)
+
+te$target <- log(te$target)
+
+# Unify Non Scaled train and test
+tr_te <- tr %>% 
+  bind_rows(te) %>% 
+  select(-c(na_count))
+```
+
+## Scaling target variable (Data set with no missing values)
+
+```{r}
+# Check Normal distribution on target
+df_port$target <- log(df_port$target)
+qqnorm(df_port$target)
+qqline(df_port$target)
+```
+
+## Scaling Numerical variables
+
+```{r}
+num_var <- which(sapply(tr_te, is.numeric)) #index vector numeric variables
+num_varnames <- names(num_var) #saving names vector for use later on
+num_varnames <- num_varnames[!(num_varnames %in% c("target"))]
+
+df_num <- tr_te[, names(tr_te) %in% num_varnames]
+
+
+for(i in 1:ncol(df_num)){
+        if (abs(skew(df_num[,i]))>0.8){
+                df_num[,i] <- log(df_num[,i] +1)
+        }
+}
+
+pre_num <- preProcess(df_num, method=c("center", "scale"))
+print(pre_num)
+df_norm <- predict(pre_num, df_num)
+```
+
+
+## Generating train and test data
+
+```{r}
+# Unify both categorical and numerical.
+train_test <- df_norm
+# With the original train split index, generate the data set.
+train <- train_test[tri,] # X_train
+test <- train_test[-tri,] # X_test
+y <- tr$target # X_train
+# y_train <- tr$target
+# y_test <- te$target
+
+# write.csv(train, file = "X_train.csv")
+# write.csv(test, file = "X_test.csv")
+# write.csv(y, file = "y_train.csv")
+# write.csv(te$target, file = "y_test.csv")
+```
+
+
+# Machine learning model {.tabset}
+
+## Ensemble eXtreme Gradient Boosting + Ridge Regression
+
+```{r}
+trControl <- trainControl(
+
+        method="cv",
+
+        number=7,
+
+        savePredictions="all",
+
+        index=createResample(tr$target, 7),  
+
+        allowParallel = TRUE
+
+)
+
+xgbTreeGrid <- expand.grid(nrounds = 400, max_depth = seq(2,6,by = 1), eta = 0.1, gamma = 0, colsample_bytree = 1.0,  subsample = 1.0, min_child_weight = 4)
+
+glmnetGridElastic <- expand.grid(.alpha = 0.9, .lambda = 0.009) ## notice the . before the parameter
+
+glmnetGridLasso <- expand.grid(.alpha = 1, .lambda = seq(0.001,0.1,by = 0.001))
+
+glmnetGridRidge <- expand.grid(.alpha = 0, .lambda = seq(0.001,0.1,by = 0.001))
+
+set.seed(333)
+
+modelList <<- caretList(
+
+                  x = as.matrix(train),
+
+                  y = tr$target,
+
+                  trControl=trControl,
+
+                  metric="RMSE",
+
+                  tuneList=list(
+
+                  ## Do not use custom names in list. Will give prediction error with greedy ensemble. Bug in caret.
+
+                          xgbTree = caretModelSpec(method="xgbTree",  tuneGrid = xgbTreeGrid, nthread = 8),
+
+                          glmnet=caretModelSpec(method="glmnet", tuneGrid = glmnetGridElastic), ## Elastic, highly correlated with lasso and ridge regressions
+# 
+#                           glmnet=caretModelSpec(method="glmnet", tuneGrid = glmnetGridLasso), ## Lasso
+
+                          glmnet=caretModelSpec(method="glmnet", tuneGrid = glmnetGridRidge) ## Ridge
+
+                          #svmLinear3= caretModelSpec(method="svmLinear3", tuneLenght = 20) ## SVM 
+
+                          )
+
+)
+```
+
+## Correlation
+
+```{r echo=FALSE}
+modelCor(resamples(modelList))
+```
+
+## Performance summary
+
+```{r echo=FALSE}
+summary(resamples(modelList))[[3]][2:3]
+```
+
+## Summary
+
+```{r}
+
+set.seed(333)
+
+greedyEnsemble <- caretEnsemble(
+
+  modelList, 
+
+  metric="RMSE",
+
+  trControl=trainControl(
+
+    number=7, method = "cv"
+
+  ))
+
+summary(greedyEnsemble)
+```
+
+## Q-Q plot residuals
+
+```{r echo=FALSE}
+qqnorm(resid(greedyEnsemble$ens_model$finalModel), 
+
+                ylab="standardized Residuals", 
+
+                xlab="normal Scores", 
+
+                main="Q-Q plot residuals") 
+
+qqline(resid(greedyEnsemble$ens_model$finalModel))
+```
+
+# Feature importance {.tabset}
+
+## Ridge regression
+
+```{r echo=FALSE}
+
+featureImp <- varImp(greedyEnsemble$models$glmnet.1)
+
+ggplot(featureImp, mapping = NULL,
+
+  top = dim(featureImp$importance)[1]-(dim(featureImp$importance)[1]- 9), environment = NULL) +
+
+    xlab("Feature") +
+
+    ylab("Importace") +
+
+          theme(text = element_text(size=9))
+
+```
+
+
+## SHAP XGB with optimal parameters
+
+```{r}
+# modelList$xgbTree
+
+# hyperparameter tuning results
+X = select(tr_te, -c(target))[tri,]
+param_dart <- list(objective = "reg:linear",  # For regression
+                   nrounds = 400,
+                   max_depth = 6,
+                   eta = 0.01,
+                   gamma = 0.00,
+                   colsample_bytree = 1,
+                   min_child_weight = 4,
+                   subsample = 1)
+
+mod <- xgboost::xgboost(data = as.matrix(X), 
+                        label = as.matrix(tr$target), 
+                       xgb_param = param_dart, nrounds = param_dart$nrounds,
+                       verbose = FALSE, nthread = parallel::detectCores() - 2,
+                       early_stopping_rounds = 8)
+
+
+shap_values <- shap.values(xgb_model = mod, X_train = X)
+shap_long <- shap.prep(xgb_model = mod, X_train = X)
+
+
+```
+  
+
+## Plot
+
+```{r}
+imp_matrix <- as.tibble(xgb.importance(feature_names = colnames(X), model = mod))
+
+
+
+imp_matrix %>%
+
+  ggplot(aes(reorder(Feature, Gain, FUN = max), Gain, fill = Feature)) +
+
+  geom_col() +
+
+  coord_flip() +
+
+  theme(legend.position = "none") +
+
+  labs(x = "Features", y = "Importance")
+```
+
+
+```{r}
+imp_matrix <- as.matrix(shap_values$mean_shap_score)
+rownames(imp_matrix)
+imp_matrix <- as.tibble(data.frame(Feature = row.names(imp_matrix), Importance = imp_matrix))
+
+imp_matrix
+imp_matrix %>%
+
+  ggplot(aes(reorder(Feature, Importance, FUN = max), Importance, fill = Feature)) +
+
+  geom_col() +
+
+  coord_flip() +
+
+  theme(legend.position = "none") +
+
+  labs(x = "Variables", y = "Importancia relativa")
+```
+
+```{r}
+shap_values$mean_shap_score
+```
+
+  
+  
+## Summary plot
+
+The following plot shows the most important features, and their impact on the filtering rate.
+
+```{r fig.width=8, fig.height=8}
+shap.plot.summary.wrap2(shap_values$shap_score, as.matrix(X), top_n = 10, dilute = 0)
+```
+
+## Force plot.
+
+A SHAP force plot shows the contribution of the most important features divided by quantity.
+
+```{r echo=FALSE, fig.width=7}
+plot_data <- shap.prep.stack.data(shap_contrib = shap_values$shap_score, top_n = 4, n_groups = 6)
+# choose to zoom in at location 500, set y-axis limit using `y_parent_limit`  
+# it is also possible to set y-axis limit for zoom-in part alone using `y_zoomin_limit`  
+shap.plot.force_plot(plot_data, zoom_in_location = 250, y_parent_limit = c(-0.25,0.25))
+```
+
+## Importance plot.
+
+The distribution of the real values agaisnt the contribution that they have on the filtering rate.
+
+```{r}
+fig_list <- lapply(names(shap_values$mean_shap_score)[1:4], 
+                   shap.plot.dependence, data_long = shap_long)
+gridExtra::grid.arrange(grobs = fig_list, ncol = 2)
+```
+
+## Between variable plots.
+
+```{r fig.width=7, fig.height=9}
+shap_int <- shap.prep.interaction(xgb_mod = mod, X_train = as.matrix(X))
+
+g3 <- shap.plot.dependence(data_long = shap_long,
+                           data_int = shap_int,
+                           x= "temp", y = "conduct", 
+                           color_feature = "conduct")
+g4 <- shap.plot.dependence(data_long = shap_long,
+                           data_int = shap_int,
+                           x= "conduct", y = "sol_filt_pct", 
+                           color_feature = "sol_filt_pct")
+gridExtra::grid.arrange(g3, g4, ncol=2)
+```
+

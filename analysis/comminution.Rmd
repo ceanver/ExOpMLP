@@ -1,0 +1,1080 @@
+---
+title: "Excelencia Operacional SAG"
+author: "Cecil V."
+date: '`r Sys.Date()`'
+output:
+  workflowr::wflow_html:  
+    theme: flatly
+    number_sections: true
+    toc: true
+    code_folding: hide
+    highlight: tango 
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+# knitr::opts_chunk$set(echo=TRUE, error=FALSE)
+knitr::opts_chunk$set(comment = "#", collapse = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+# General functions and models #
+library(ggfortify)  # autoplot(time series ggplot)
+library(ggthemes)
+library(ggridges)
+library(plotly)
+library(tibbletime) # Time aware tibbles
+library(GGally) # clustering pair plot
+library(reticulate) # python
+library(xgboost) # 
+library(SHAPforxgboost)
+library(glmnet)
+require(caretEnsemble) # ensemble modelling
+library(gridExtra)
+# general visualisation #
+library(ggplot2) # visualisation
+library(grid) # visualisation
+library(corrplot) # correlation plot matrix
+library(RColorBrewer) # Colours
+require(DT) # display data in html tables
+
+library(here)
+library(tidyr)
+library(anomalize)## time seeries anomalies
+
+# general data manipulation #
+library(dplyr) # data manipulation
+library(data.table) # data manipulation
+library(tibble) # data wrangling
+library(caret) # Clasiffication And Regression Training
+library(psych) # skew
+
+library(VIM)
+# specific visualisation #
+
+# specific data manipulation #
+library(janitor) # clean headers
+library(naniar) # missing data
+library(mice) # Imputation
+library(broom)
+
+library(forecast)
+library(lubridate)
+# Date plus forecast
+
+## Helper functions 
+# 
+py_available(TRUE)
+# knitr::opts_chunk$set(echo=TRUE, error=FALSE)
+knitr::knit_engines$set(python = reticulate::eng_python)
+```
+
+
+# Introduction
+
+```{r}
+library(DT)
+    tags <- read.csv("data/comminution/tags.csv", header = TRUE, sep = ",")
+
+options(DT.options = list(pageLength = 5))
+
+datatable(tags) %>% formatStyle('Line', backgroundColor = styleEqual(c(0, 1, 2), c('gray', 'purple', "green"))
+)
+```
+
+Aside from parameters fixed at design (mill dimensions, installed power, and circuit type), the major variables affecting AG/SAG mill circuit performance (throughput and grind attained) include:
+
+## Feed characteristics in terms of ore hardness/competency
+
+The effect of feed hardness is the most significant driver for AG/SAG performance: with variations in ore hardness come variations in circuit throughput. The effect of feed size is marked, with both larger and finer feed sizes having a significant effect on throughput. With SAG mills, the response is typically that for coarser ores, throughput declines, and vice versa.
+
+## Feed size distribution
+
+- **Selection of circuit configuration in terms of liner and grate selection and closing size (screen apertures or hydrocyclone operating conditions)**
+
+- **Ball charge (fraction of volumetric loading and ball size)**
+
+- **Mill operating conditions including mill speed (for circuits with variable speed drives), density, and total mill load**
+
+
+# Loading data {.tabset .tabset-fade .tabset-pills}
+
+## Read process data
+
+Sub indexes 1 and 2 stand for Grind circuit 1 and 2 respectively.
+The operating Work index is defined as:
+W = $\LARGE{ \frac{Potencia} {Feed *(\sqrt{\frac{10}{P80}} - \sqrt{\frac{10}{F80}}}}$
+
+```{r}
+dt <- as_tibble(fread("data/comminution/mlp_molienda.csv")) %>% 
+  cbind(as_tibble(fread("data/comminution/mlp_molienda_P80.csv")))
+
+# dt <- Filter(function(x) !all(is.na(x)), dt)
+
+names(dt) <- tags$name[match(names(dt), tags$TAG)]
+keep.cols <- names(dt) %in% c("NaN", NA)
+  
+### Evident conditions
+dt <- as_tibble(dt[! keep.cols]) %>% 
+    filter(F_M2 > 0, CC_M1>0, CC_M2>0)
+###
+
+### Data for SAG 1
+dt1 <- dt %>% 
+  select(c(F_M1, Csol_M1, CC_M1,
+           grav1_M1, grav2_M1, peb_M1,
+           hard, F80_M1, fine_1, P80_1,
+           V_M1, P_M1,
+           state_M1, date)) %>% 
+    mutate(RPG_1 = ifelse(is.na(grav2_M1), 
+                          peb_M1 + grav1_M1,
+                          peb_M1 * (grav2_M1 >= grav1_M1) + 
+                            (peb_M1 + grav1_M1 - grav2_M1) * 
+                            (grav2_M1 < grav1_M1)),
+           FF_1 = ifelse(is.na(RPG_1), F_M1, F_M1 - RPG_1), 
+           F80_M1 = F80_M1 * 25.4,
+           W_1 = P_M1 / (F_M1 * 
+                           (10/sqrt(P80_1) - 
+                            10/sqrt(F80_M1 * 1e3))
+                         ),
+           Ecs_1 = P_M1 / F_M1
+           ) %>% 
+  # filter(state_M1 == 1) %>%
+  select(-c(grav1_M1, grav2_M1, peb_M1, 
+            state_M1))
+###
+
+### Data for SAG 2
+dt2 <- dt %>% 
+  select(c(F_M2, Csol_M2, CC_M2,
+           grav2_M1, peb_M2,
+           hard, F80_M2, fine_2, P80_2,
+           V_M2, P_M2,
+           state_M2, date)) %>% 
+  mutate(RPG_2 = peb_M2 + grav2_M1,
+         FF_2 = F_M2 - RPG_2,
+         F80_M2 = F80_M2 * 25.4,
+         W_2 = P_M2 / (F_M2 * 
+                          (10/sqrt(P80_2) - 
+                           10/sqrt(F80_M2 * 1e3))
+                       ),
+         Ecs_2 = P_M2 / F_M2
+         ) %>%
+  # filter(state_M2 == 1) %>% 
+  select(-c(grav2_M1, peb_M2, 
+            state_M2))
+###
+
+### Resample time
+require(reticulate)
+pd <- import("pandas")
+
+df1 <- r_to_py(dt1)
+df2 <- r_to_py(dt2)
+
+df1 = df1$set_index(pd$DatetimeIndex(df1['date']))
+df2 = df2$set_index(pd$DatetimeIndex(df2['date']))
+
+df1 = df1$resample("1H", closed = "left", label = "left", base = 8)$agg("median")
+df2 = df2$resample("1H", closed = "left", label = "left", base = 8)$agg("median")
+
+df1 = df1$dropna(how = "all")
+df1 = df1$reset_index()
+df2 = df2$dropna(how = "all")
+df2 = df2$reset_index()
+
+dt1 <- py_to_r(df1) 
+dt2 <- py_to_r(df2)
+```
+
+## First and last rows {.tabset}
+
+### Line 1
+
+```{r}
+headTail(dt1)
+```
+
+### Line 2
+
+```{r}
+headTail(dt2)
+```
+
+## Dimensions
+
+Those are the dimensions of the comminition data set:
+
+```{r}
+cat('There are', c(ncol(dt1),nrow(dt1)), 'columns and rows for Line 1')
+# cat('There are', c(ncol(dt2),nrow(dt2)), 'columns and rows for Line 2')
+```
+
+## Data profile
+
+```{r echo=FALSE}
+descStats <- describe(dt1) 
+
+datatable(round(descStats,2), rownames = T,
+
+          caption = "Descriptive statistics", 
+
+          options = list(pageLength = 8)) ## Interactive HTML table
+```
+
+## Near zero variance variables
+
+Variables with zero variance are mostly constant across the data set, hence might provide little information and potentially cause overfitting. The table is generated on the training data with help of the caret package.
+
+```{r echo=FALSE}
+
+zeroVarianceVariables.df <- nearZeroVar(dt1, names = T, saveMetrics = T,
+    
+                                        foreach = T, allowParallel = T)
+
+datatable(round(subset(zeroVarianceVariables.df, nzv == TRUE, 
+
+                       select =     c("freqRatio","percentUnique")),2), 
+
+          rownames = T,
+
+          caption = "Variables with (near) zero variance", 
+
+          options = list(pageLength = 8))
+
+```
+
+
+# Missing values{.tabset .tabset-fade .tabset-pills}
+
+## Frequency {.tabset}
+
+### Line 1
+
+```{r}
+gg_miss_var(dt1)
+```
+
+### Line 2 
+
+```{r}
+gg_miss_var(dt2)
+```
+
+## Missing data representated geometrically
+
+The variables mentiones above are represented graphycally to search for any pattern. In this graph, the data which is missing, is given a value of 10% less than the minimum value of the available data. Then, it's represented in a dispersion graph were the red color represents the missing data.
+
+```{r split=FALSE, fig.align = 'default', warning = FALSE, fig.cap ="Fig. 1", out.width="100%"}
+
+p1 <- dt1 %>%
+  ggplot(aes(x = date, y = P80_1)) +
+  geom_miss_point()
+
+p2 <- dt2 %>%
+  ggplot(aes(x = date, y = P80_2)) +
+  geom_miss_point()
+
+p3 <- dt1 %>%
+  ggplot(aes(x = date, y = Csol_M1)) +
+  geom_miss_point()
+
+p4 <- dt2 %>%
+  ggplot(aes(x = date, y = Csol_M2)) +
+  geom_miss_point()
+
+grid.arrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
+```
+
+# Correlations {.tabset .tabset-fade .tabset-pills}
+
+## Grinding circuit Line 1 {.tabset}
+
+### Histogram Line 1 
+
+```{r}
+dt1 %>% 
+  select(-c(date)) %>%
+  gather(Attributes, value) %>% 
+  ggplot(aes(x=value, fill=Attributes)) +
+    geom_histogram(bins = 20, colour="black", show.legend=FALSE) +
+  facet_wrap(~Attributes, scales="free_x") +
+  labs(x="Values", y="Frequency",
+       title="Line 1 Variables - Histograms") +
+  theme_bw()
+```
+
+### Pearson correlation test Line 1
+
+```{r echo=FALSE, fig.width=14, fig.height=14}
+cor_M <- dt1 %>%
+  select(-c(date)) %>% 
+  na.omit() %>% 
+  cor()
+
+## plot correlation
+cor.mtest <- function(mat, ...) {
+    mat <- as.matrix(mat)
+    n <- ncol(mat)
+    p.mat<- matrix(NA, n, n)
+    diag(p.mat) <- 0
+    for (i in 1:(n - 1)) {
+        for (j in (i + 1):n) {
+            tmp <- cor.test(mat[, i], mat[, j], ...)
+            p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+        }
+    }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+
+p.mat <- dt1 %>% 
+  select(-c(date)) %>% 
+  cor.mtest() 
+
+
+corrplot(cor_M, 
+         title = "", 
+         type = "lower", 
+         order = "hclust",
+         hclust.method = "centroid",
+         tl.cex = 2,
+         tl.col = "black",
+         tl.srt = 45, 
+         p.mat = p.mat, 
+         sig.level = 0.01,
+         insig = "blank",
+         col=brewer.pal(n=8, name="PuOr"))
+```
+
+## Grinding circuit Line 2 {.tabset}
+
+### Histogram Line 1
+
+```{r}
+dt2 %>% 
+  select(-c(date)) %>%
+  gather(Attributes, value) %>%
+  ggplot(aes(x=value, fill=Attributes)) +
+  geom_histogram(bins = 10, colour="black", show.legend=FALSE) +
+  facet_wrap(~Attributes, scales="free_x") +
+  labs(x="Values", y="Frequency",
+       title="Line 2 Variables - Histograms") +
+  theme_bw() 
+```
+
+### Pearson correlation test Line 2
+
+```{r echo=FALSE, fig.width=14, fig.height=14}
+cor_M <- dt2 %>%
+  select(-c(date)) %>% 
+  na.omit() %>% 
+  cor()
+
+## plot correlation
+cor.mtest <- function(mat, ...) {
+    mat <- as.matrix(mat)
+    n <- ncol(mat)
+    p.mat<- matrix(NA, n, n)
+    diag(p.mat) <- 0
+    for (i in 1:(n - 1)) {
+        for (j in (i + 1):n) {
+            tmp <- cor.test(mat[, i], mat[, j], ...)
+            p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+        }
+    }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+
+p.mat <- dt2 %>% 
+  select(-c(date)) %>% 
+  cor.mtest()
+
+
+corrplot(cor_M, 
+         title = "", 
+         type = "lower", 
+         order = "hclust",
+         hclust.method = "centroid",
+         tl.cex = 2,
+         tl.col = "black",
+         tl.srt = 45, 
+         p.mat = p.mat, 
+         sig.level = 0.01,
+         insig = "blank",
+         col=brewer.pal(n=8, name="PuOr"))
+```
+
+# Segmentation of Mineral size and hardness {.tabset .tabset-fade .tabset-pills}
+
+## Clustering {.tabset}
+
+### K-nearest neighbours
+
+We select the variables related to mineral hardness.
+
+```{r}
+# cluster_vars <- c("hard", "F80_M1", "fine_1", "P80_1") 
+cluster_vars <- c("hard", "F80_M1")
+
+dt1_knn <- dt1 %>%
+  # na.omit() %>%
+  drop_na(cluster_vars) %>%
+  select(cluster_vars) %>%
+  # select(-c(date)) %>%
+  scale() %>%
+  as.data.frame()
+
+bss <- numeric()
+wss <- numeric()
+
+# Run the algorithm for different values of k
+set.seed(1234)
+k = 10 # Number of Clusters
+for(i in 1:k){
+
+  # For each k, calculate betweenss and tot.withinss
+  bss[i] <- kmeans(dt1_knn, centers=i)$betweenss
+  wss[i] <- kmeans(dt1_knn, centers=i)$tot.withinss
+
+}
+
+# Between-cluster sum of squares vs Choice of k
+p3 <- qplot(1:k, bss, geom=c("point", "line"), 
+            xlab="Number of clusters", ylab="Between-cluster sum of squares") +
+  scale_x_continuous(breaks=seq(0, k, 1)) +
+  theme_bw()
+
+# Total within-cluster sum of squares vs Choice of k
+p4 <- qplot(1:k, wss, geom=c("point", "line"),
+            xlab="Number of clusters", ylab="Total within-cluster sum of squares") +
+  scale_x_continuous(breaks=seq(0, k, 1)) +
+  theme_bw()
+
+# Subplot
+grid.arrange(p3, p4, ncol=2)
+```
+
+### Clustering Pair plot
+
+```{r}
+isnt_out_z <- function(x, thres = 3, na.rm = TRUE) {
+  abs(x - mean(x, na.rm = na.rm)) <= thres * sd(x, na.rm = na.rm)
+}
+isnt_out_mad <- function(x, thres = 3, na.rm = TRUE) {
+      abs(x - median(x, na.rm = na.rm)) <= thres * mad(x, na.rm = na.rm)
+}
+isnt_out_tukey <- function(x, k = 1.5, na.rm = TRUE) {
+  quar <- quantile(x, probs = c(0.25, 0.75), na.rm = na.rm)
+  iqr <- diff(quar)
+  
+  (quar[1] - k * iqr <= x) & (x <= quar[2] + k * iqr)
+}
+maha_dist <- . %>% select_if(is.numeric) %>%
+    mahalanobis(center = colMeans(.), cov = cov(.))
+
+isnt_out_maha <- function(tbl, isnt_out_f, ...) {
+  tbl %>% maha_dist() %>% isnt_out_f(...)
+}
+isnt_out_funs <- funs(
+  z = isnt_out_z,
+  mad = isnt_out_mad,
+  tukey = isnt_out_tukey
+)
+  
+dt1_imp <- dt1 %>% 
+  drop_na(cluster_vars) %>%
+  cbind(rock = as.factor(kmeans(dt1_knn, centers = 8)$cluster)) %>% 
+  filter(!(abs(F80_M1 - median(F80_M1)) > 4*sd(F80_M1))) %>%
+  filter(!(abs(hard - median(hard)) > 5*sd(hard))) %>% 
+  filter(FF_1 > 0)
+  
+# intervals <- dt1_imp %>%
+#   group_by(rock) %>%
+#   summarise(min = min(hard), max = max(hard))
+# intervals
+
+ggpairs(dt1_imp %>% select(cluster_vars, rock),
+      columns= 1:(1 + length(cluster_vars)), aes(colour = rock, alpha=0.5),
+      lower=list(continuous="points"),
+      upper=list(continuous="blank"),
+      axisLabels="none", switch="both") +
+      theme_bw()
+```
+
+There is some potential with bivariate clustering. A more statisticall and technically correct approach would be to generate samples and test hypothesis with ANOVA.
+
+## Breaking harness into categories
+
+```{r}
+ApplyTerciles <- function(x) {
+  cut(x, breaks = c(quantile(dt1_imp$hard, 
+                             probs = seq(0, 1, by = 1/3),
+                             na.rm = TRUE)), 
+      labels=c("soft", "medium", "hard"), 
+      include.lowest=TRUE)}
+
+dt1_imp$hard_qt <- sapply(dt1_imp$hard, ApplyTerciles)
+
+ApplyQuintiles <- function(x) {
+  cut(x, breaks = c(quantile(dt1_imp$F80_M1, 
+                           probs = seq(0, 1, by = 1/3),
+                           na.rm = TRUE)), 
+  # cut(x, breaks = c(80,90,100,110, 120,Inf), 
+        labels=c("fine", "norm","coarse"), 
+      include.lowest=TRUE)}
+dt1_imp$F80_qt <- sapply(dt1_imp$F80_M1, ApplyQuintiles)
+
+
+p1 <- dt1_imp %>%
+  mutate(visitors = hard, wday = hard_qt) %>% 
+  group_by(wday) %>%
+  summarise(mean_log_visitors = mean((visitors)),
+            sd_log_visitors = sd((visitors))) %>%
+  ggplot(aes(wday, mean_log_visitors, color = wday)) +
+
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = mean_log_visitors - sd_log_visitors,
+                    ymax = mean_log_visitors + sd_log_visitors,
+                    color = wday), width = 0.5, size = 0.7) +
+  theme(legend.position = "none")
+
+p2 <- dt1_imp %>%
+  mutate(visitors = hard, wday = hard_qt) %>% 
+  mutate(visitors = log1p(visitors)) %>%
+  ggplot(aes(visitors, wday, fill = wday)) +
+  geom_density_ridges(bandwidth = 0.1) +
+  theme(legend.position = "none") +
+  labs(x = "log1p(visitors)", y = "")
+
+p3 <- dt1_imp %>%
+  mutate(visitors = F80_M1, month = F80_qt) %>% 
+  group_by(month) %>%
+  summarise(mean_log_visitors = mean(log1p(visitors)),
+            sd_log_visitors = sd(log1p(visitors))) %>%
+  ggplot(aes(month, mean_log_visitors, color = month)) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin = mean_log_visitors - sd_log_visitors,
+                    ymax = mean_log_visitors + sd_log_visitors,
+                    color = month), width = 0.5, size = 0.7) +
+  theme(legend.position = "none")
+
+p4 <- dt1_imp %>%
+  mutate(visitors = F80_M1, month = F80_qt) %>% 
+  mutate(visitors = log1p(visitors)) %>%
+  ggplot(aes(visitors, month, fill = month)) +
+  geom_density_ridges(bandwidth = 0.1) +
+  theme(legend.position = "none") +
+  labs(x = "log1p(visitors)", y = "")
+
+
+grid.arrange(p1, p2, p3, p4, nrow=2, ncol=2)
+```
+
+## Effects of hardness
+
+We try to see if the hardness has any effects on the efficiency defined as tph and operating bond wond index.
+```{r}
+petal.w.l <- ggplot(data = dt1_imp, mapping = aes(x = W_1, y = F_M1, color = F80_qt)) +
+      geom_point() +
+      geom_smooth() +
+      scale_color_brewer(palette = 'Accent') +
+      theme_classic() +
+      xlim(4.5, 10) +
+      ylim(1000, 4000) +
+      theme(plot.background = element_rect(fill = "grey97")) +
+      labs(title = 'Effects of Feed size', 
+           x = 'Bond Operating Index', 
+           y = 'Mill Throughput (TpH)')
+ggplotly(petal.w.l)
+```
+
+
+# Start up Effect {.tabset .tabset-fade .tabset-pills}
+
+## Anomaly detection with Isolation Forest
+
+Isolation Forest is an outlier detection technique that identifies anomalies instead of normal observations. Similarly to Random Forest, it is built on an ensemble of binary (isolation) trees. The algorithm isolates each point in the data and splits them into outliers or inliers. This split depends on how long it takes to separate the points.
+If we try to segregate a point which is obviously a non-outlier, it’ll have many points in its round, so that it will be really difficult to isolate. On the other hand, if the point is an outlier, it’ll be alone and we’ll find it very easily.
+
+How do we separate each point? The simple procedure is as follows for each point of the data set:
+
+1. Select the point to isolate.
+2. For each feature, set the range to isolate between the minimum and the maximum.
+3. Choose a feature randomly.
+4. Pick a value that’s in the range, again randomly:
+- If the chosen value keeps the point above, switch the minimum of the range of the feature to the value.
+- If the chosen value keeps the point below, switch the maximum of the range of the feature to the value.
+5. Repeat steps 3 & 4 until the point is isolated. That is, until the point is the only one which is inside the range for all features.
+6. Count how many times you’ve had to repeat steps 3 & 4. We call this quantity the isolation number.
+
+The algorithm claims that a point is an outlier if it doesn’t have to repeat the steps 3 & 4 several times.
+
+
+```{python}
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import IsolationForest
+from sklearn.preprocessing import StandardScaler
+import matplotlib
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
+  
+df1_imp = r.dt1_imp.copy()
+df1_imp = df1_imp.assign(
+    date_time = pd.to_datetime(df1_imp.loc[:, "date"])
+    ).loc[:, ["date_time", "V_M1"]].sort_values('date_time')
+
+df1_imp = df1_imp.assign(
+  date_time_int = df1_imp.loc[:, "date_time"].astype(np.int64)
+  ).loc[:, ["date_time_int", "V_M1"]]
+# df1_imp
+
+outliers_fraction = 0.05
+scaler = StandardScaler()
+np_scaled = scaler.fit_transform(df1_imp)
+data = pd.DataFrame(np_scaled)
+# train isolation forest
+model =  IsolationForest(behaviour='new', contamination = outliers_fraction)
+model.fit(data)
+df1_imp = df1_imp.assign(
+anomaly = pd.Series(model.predict(data)))
+
+fig, ax = plt.subplots(figsize=(10,6))
+a = df1_imp.loc[df1_imp["anomaly"] == - 1, ['date_time_int', 'V_M1']]
+ax.plot(df1_imp['date_time_int'], df1_imp['V_M1'], color='blue', label = 'Normal')
+ax.scatter(a['date_time_int'], a['V_M1'], color = 'red', label = 'Anomaly')
+plt.legend()
+plt.show()
+```
+          
+## Anomalies trend over time
+  
+```{r}
+dts <- dt1_imp %>% 
+  cbind(py$df1_imp %>% select(c(anomaly))) %>% 
+  mutate(anomaly = ifelse(anomaly == -1, 0, anomaly))
+
+dts$Date <- as.Date(dts$date, "%Y-%m-%d")
+
+dts <- dts[order(as.Date(dts$Date, format="%Y-%m-%d")),]
+
+dts %>%
+  group_by(Date) %>%
+  summarise(anomaly = sum(anomaly)) %>%
+  ggplot(aes(Date, anomaly)) +
+  geom_line() +
+  geom_smooth(method = "loess", color = "blue", span = 1/7) +
+  labs(y = "Number of Anomalies", x = "Date")
+```
+
+Overall, we can see a decreasing trend in the amount Velocity anomalies. 
+
+# Fresh Feed Trend {.tabset .tabset-fade .tabset-pills}
+
+## Fresh Mill Throughput Time series data
+
+```{r}
+dts <- dt1_imp %>% 
+  mutate(Date = as.Date(dt1_imp$date, "%Y-%m-%d"),
+         Date = ymd(Date),
+         year = as.factor(year(Date)),
+         color = ifelse(FF_1 > mean(.$FF_1), 'Above', 'Below'),
+         month = month(Date),
+         day = day(Date),
+         week = week(Date)) %>% 
+  cbind(py$df1_imp %>% select(c(anomaly))) %>% 
+  filter(anomaly == 1) %>%
+  select(Date, year, month, day, week, 
+         color, FF_1, F80_qt, hard_qt,
+         F_M1, Ecs_1, CC_M1)
+headTail(dts)
+```
+
+## Fresh Mill Throughput Boxplot {.tabset}
+
+### Yearly trend
+
+```{r}
+ggplot(data = dts, aes(x = year, y = FF_1)) +
+        geom_jitter(pch = 21, alpha = .2, color = 'dark orange') +
+        geom_boxplot(color = 'dark blue') +
+        theme_few() +
+        theme(legend.position = 'none') +
+        geom_hline(yintercept = mean(dts$FF_1), linetype = 'dotted') +
+        xlab('') +
+        ylab('Mill Throughput (TpH)') +
+        labs(title = 'Yearly performance',
+             subtitle = 'Mill Throughput in 2018-2019')
+```
+
+### Monthly trend
+
+```{r}
+ggplot(data = dts, aes(x = as.factor(month), y = FF_1)) +
+        geom_jitter(pch = 21, alpha = .2, color = 'dark orange') +
+        geom_boxplot(color = 'dark blue') +
+        theme_few() +
+        theme(legend.position = 'none') +
+        geom_hline(yintercept = mean(dts$FF_1), linetype = 'dotted') +
+        xlab('Month') +
+        ylab('Mill Throughput (TpH)') +
+        labs(title = 'Monthly performance',
+             subtitle = 'Mill Throughput in 2018-2019')
+```
+
+### Fresh Mill Throughput trend {.tabset}
+
+### Yearly trend by feed size
+
+```{r}
+ggplot(data = dts, aes(x = Date, y = FF_1, color = F80_qt)) + 
+  geom_line(size = 0.5) +
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC"),
+        legend.text = element_text(size=7)) + 
+  labs(title="Fresh Mill Throughput by feed size") + 
+  geom_hline(yintercept=max(dts$FF_1), linetype="dashed", color = "red") +
+  geom_hline(yintercept=min(dts$FF_1), linetype="dashed", color = "blue")
+```
+
+### Fresh Mill Throughput yearly trend by hardness
+
+```{r}
+ggplot(data = dts, aes(x = Date, y = FF_1, color = hard_qt)) + 
+  geom_line(size = 0.5) +
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC"),
+        legend.text = element_text(size=7)) + 
+  labs(title="Fresh Mill Throughput by hardness") + 
+  geom_hline(yintercept=max(dts$FF_1), linetype="dashed", color = "red") +
+  geom_hline(yintercept=min(dts$FF_1), linetype="dashed", color = "blue")
+```
+
+# Decomposition by hardness and size {.tabset .tabset-fade .tabset-pills}
+
+## Fresh Mill Throughput
+
+```{r fig.width=14, fig.height=14}
+## Filtering by type
+rock_1 <- dts %>% 
+  filter(hard_qt == "soft")
+rock_1 <- as_tbl_time(rock_1, index=Date)
+rock_1 <- as_period(rock_1, '1 month')
+
+rock_2 <- dts %>% 
+  filter(hard_qt == "medium")
+rock_2 <- as_tbl_time(rock_2, index=Date)
+rock_2 <- as_period(rock_2, '1 month')
+
+rock_3 <- dts %>% 
+  filter(hard_qt == "hard")
+rock_3 <- as_tbl_time(rock_3, index=Date)
+rock_3 <- as_period(rock_3, '1 month')
+# options(repr.plot.width=8, repr.plot.height=6)
+rock_1_monthly <- rock_1 %>%
+  ggplot(aes(x = Date, y = FF_1, color = F80_qt)) + 
+  geom_line(size = 1.5) +
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC"),
+        legend.text = element_text(size=7)) + 
+  labs(title="Soft rock") +
+  geom_hline(yintercept=max(rock_1$FF_1), linetype="dashed", color = "red") +
+  geom_hline(yintercept=min(rock_1$FF_1), linetype="dashed", color = "blue")
+
+# Let's create a volume chart
+rock_1_volume <- rock_1 %>%
+  ggplot(aes(x=Date, y = FF_1)) + 
+  geom_bar(stat='identity', fill="#7FB3D5",
+           color="black") + theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC")) +
+  geom_smooth(method="loess", color="red")
+
+rock_2_monthly <- rock_2 %>% 
+  ggplot(aes(x=Date, y = FF_1, color = F80_qt)) + 
+  geom_line(size = 1.5) +
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC"),
+        legend.text = element_text(size=7)) + 
+  labs(title="Medium") + 
+  geom_hline(yintercept=max(rock_2$FF_1), 
+             linetype="dashed", color = "red") + 
+  geom_hline(yintercept=min(rock_2$FF_1), linetype="dashed", color = "blue")
+
+rock_2_volume <- rock_2 %>%
+  ggplot(aes(x=Date, y=FF_1)) +
+  geom_bar(stat='identity',fill="#58D68D",color="black") + 
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC")) +
+  geom_smooth(method="loess", color="red")
+
+rock_3_monthly <- rock_3 %>% 
+  ggplot(aes(x=Date, y=FF_1, color=F80_qt)) + 
+  geom_line(size = 1.5) +
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC"),
+        legend.text = element_text(size=7)) + 
+  labs(title="Hard rock") + 
+  geom_hline(yintercept=max(rock_3$FF_1), 
+             linetype="dashed", color = "red") + 
+  geom_hline(yintercept=min(rock_3$FF_1), linetype="dashed", color = "blue")
+
+rock_3_volume <- rock_3 %>%
+  ggplot(aes(x=Date, y=FF_1)) +
+  geom_bar(stat='identity',fill="#FE642E",color="black") + 
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC")) +
+  geom_smooth(method="loess", color="red")
+
+grid.arrange(rock_1_monthly, rock_2_monthly, rock_3_monthly,
+             rock_1_volume, rock_2_volume, rock_3_volume, 
+             nrow=2, ncol=3)
+```
+
+## Load Cell 
+
+```{r fig.width=14, fig.height=14}
+# options(repr.plot.width=8, repr.plot.height=6)
+rock_1_monthly <- rock_1 %>%
+  ggplot(aes(x = Date, y = CC_M1, color = F80_qt)) + 
+  geom_line(size = 1.5) +
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC"),
+        legend.text = element_text(size=7)) + 
+  labs(title="Soft rock") +
+  geom_hline(yintercept=max(rock_1$CC_M1), linetype="dashed", color = "red") +
+  geom_hline(yintercept=min(rock_1$CC_M1), linetype="dashed", color = "blue")
+
+# Let's create a volume chart
+rock_1_volume <- rock_1 %>%
+  ggplot(aes(x=Date, y = CC_M1)) + 
+  geom_bar(stat='identity', fill="#7FB3D5",
+           color="black") + theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC")) +
+  geom_smooth(method="loess", color="red")
+
+rock_2_monthly <- rock_2 %>% 
+  ggplot(aes(x=Date, y = CC_M1, color = F80_qt)) + 
+  geom_line(size = 1.5) +
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC"),
+        legend.text = element_text(size=7)) + 
+  labs(title="Medium") + 
+  geom_hline(yintercept=max(rock_2$CC_M1), 
+             linetype="dashed", color = "red") + 
+  geom_hline(yintercept=min(rock_2$CC_M1), linetype="dashed", color = "blue")
+
+rock_2_volume <- rock_2 %>%
+  ggplot(aes(x=Date, y=CC_M1)) +
+  geom_bar(stat='identity',fill="#58D68D",color="black") + 
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC")) +
+  geom_smooth(method="loess", color="red")
+
+rock_3_monthly <- rock_3 %>% 
+  ggplot(aes(x=Date, y=CC_M1, color=F80_qt)) + 
+  geom_line(size = 1.5) +
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC"),
+        legend.text = element_text(size=7)) + 
+  labs(title="Hard rock") + 
+  geom_hline(yintercept=max(rock_3$CC_M1), 
+             linetype="dashed", color = "red") + 
+  geom_hline(yintercept=min(rock_3$CC_M1), linetype="dashed", color = "blue")
+
+rock_3_volume <- rock_3 %>%
+  ggplot(aes(x=Date, y=CC_M1)) +
+  geom_bar(stat='identity',fill="#FE642E",color="black") + 
+  theme_economist() + 
+  theme(plot.title=element_text(hjust=0.5),
+        plot.background=element_rect(fill="#D5D8DC")) +
+  geom_smooth(method="loess", color="red")
+
+grid.arrange(rock_1_monthly, rock_2_monthly, rock_3_monthly,
+             rock_1_volume, rock_2_volume, rock_3_volume, 
+             nrow=2, ncol=3)
+```
+
+# Assesing the increase in the Fresh Mill Throughput {.tabset .tabset-fade .tabset-pills}
+
+## Daily mean
+
+```{r}
+dts_all <- dts %>%
+  # filter(hard_qt == "soft") %>%
+  group_by(Date) %>%
+  summarise(FF_1 = mean(FF_1))
+  
+dts_all <- ts(dts_all$FF_1, frequency = 31, start = c(1, 1))
+
+autoplot(dts_all) +
+  geom_line() +
+  geom_smooth(method = "loess", color = "blue", span = 1/7) +
+  labs(y = "Mill Thoughput (TpH)", x = "Months since January 2018") +
+  ggtitle("Time Plot: Daily Mill Thoughput (TpH)")
+```
+
+## STL decomposition
+
+```{r}
+ts_FF_1 <- dts %>%
+  group_by(Date) %>%
+  summarise(FF_1 = mean(FF_1))
+pol_ts <- ts(ts_FF_1$FF_1, frequency = 31, start = c(1, 1))
+
+# pol_ts_decompose <- decompose(pol_ts)
+# actual<-autoplot(pol_ts_decompose$x)+xlab("Year")+ylab("Count")+ggtitle("Actual time series of ozone")
+# seas<-autoplot(pol_ts_decompose$seasonal)+xlab("Year")+ylab("Count")+ggtitle("Seasonality time series of ozone")
+# tren<-autoplot(pol_ts_decompose$trend)+xlab("Year")+ylab("Count")+ggtitle("Trend time series of ozone")
+# grid.arrange(actual,seas,tren,ncol=1,top="Decomposition of Ozone time series")
+
+pol_ts %>%
+  stl(t.window = 7, s.window="periodic", robust = TRUE) %>%
+  autoplot()
+```
+
+## Detrending
+
+```{r}
+DY <- diff(dts_all)
+autoplot(DY) +
+  geom_line() +
+  geom_smooth(method = "loess", color = "blue", span = 1/7) +
+  labs(y = "Mill Thoughput (TpH)", x = "Months since January 2018") +
+  ggtitle("Time Plot: Daily Mill Thoughput (TpH)")
+```
+
+We take the difference to de-trend the data.
+
+## Seasonality
+
+```{r}
+dts_mo <- dts %>%
+  filter(month < 8) %>% 
+  group_by(year, month) %>%
+  summarise(FF_1 = mean(FF_1))
+  
+  
+dts_mo <- ts(dts_mo$FF_1, frequency = 7, start = c(2018, 01))
+ggsubseriesplot(dts_mo, labels = c("Ja", "Fe", "Ma", 
+                                   "Apr", "May", "Jun", 
+                                   "Jul"))
+```
+
+Strong seasonality. A seasonal naive method as a benchmark would be a good idea.
+
+## Seasonal Naive Method
+
+The idea is that the value on January 2018 is the same as January 2019. This hypothesis is most likely true due to the fact that our seasonality is strong.
+ 
+```{r}
+fit <- snaive(DY) #residual standart deviation = 355
+print(summary(fit))
+checkresiduals(fit)
+```
+
+We have still autocorrelation left over which means that we are leaving data behind. Howeverm they seem to be on peaks thus not as important.
+
+## ARIMA
+
+- *Auto Regressive (AR):* Means that past time points could have a certain degree of current and future time observations. The ARIMA model takes into account lagged observations in order to come up with forecast observations. A weight is added to past observations however, the weight can vary on how recent the past observations are. The more recent, the more weight is added to the most recent past observation.
+- *Integrated (I):* If there are consistent trends in the movement of past prices, it is most likely to be non-stationary meaning that seasonality persists in past movement of prices. Integrated removes the seasonality phase of our dataset in case there are consistent patterns that show that this is the case. The degree of differencing available in ARIMA models eliminates the seasonality trend issue.
+- *Moving Average (MA):* Moving average helps remove the effect of random movements of avocado prices in our case. If there was an extraordinary event that led to a surge in avocado prices, moving average will help us "smooth" things up and our time series model will not be prone to these fluctuations.
+
+
+```{r}
+# 292.3559
+arima_model <- auto.arima(dts_all, d=1, D=1, 
+                             stepwise=FALSE,
+                             approximation=FALSE, 
+                             trace=TRUE)
+fit
+print(summary(arima_model))
+checkresiduals(arima_model) + theme_minimal()
+```
+
+## Forecasting
+
+```{r}
+forecast <- forecast(arima_model, h=24)
+# Include means including the last 60 months in order to see closer the forecast.
+autoplot(forecast, incluse = 120) + theme_minimal() + theme(plot.title=element_text(hjust=0.5), plot.background=element_rect(fill="#d0f0c0"),
+      legend.position="bottom", legend.background = element_rect(fill="#fffacd",
+                                  size=0.5, linetype="solid", 
+                                  colour ="black")) + 
+labs(title="Forecasting using ARIMA model", x="Date", y="TpH")
+```
+
+
+<!-- # Fresh Mill Throughput yearly change detection -->
+
+<!-- The name CUSUM is short for cumulative sum, and it answers the question, has the mean of the observed distribution gone beyond a critical level?  -->
+<!-- CUSUM can detect when a process gets to a higher level than before, or to a lower level than before, or both. -->
+
+
+<!-- $\LARGE{x_t}$: observed value at time $t$ -->
+<!-- $\LARGE{\mu}$: mean of x, if no change -->
+
+<!-- So for each observation, $\LARGE{x_t - \mu}$ is how much above expected the observation is at time $t$. -->
+
+<!-- The basic idea is to calculate a metric S sub t and declare that we've observed a change when and if that metric goes above a threshold capital T. -->
+<!-- At each time period, we observe X sub t and see how far above the expectation it is. -->
+<!-- Then we add that amount to the previous period's metric S sub t minus 1 to give a running total S sub t. -->
+<!-- If that running total so far is greater than zero we keep it but if it's less than zero, we just reset the running total to zero. -->
+<!-- This helps CUSUM detect changes quickly, otherwise a run of lower than expected observations might delay our discovery of an increase. -->
+<!-- Basically we're saying that if the running total would -->
+<!-- be below zero, it's irrelevant to the question of whether -->
+<!-- we later see an increase. -->
+<!-- But on the other hand, we don't want to be too sensitive and say there's a change when there really isn't. -->
+<!-- We expect there to be some randomness, sometimes in fact maybe about half the time, X sub t will be higher than the expectation just at random. -->
+<!-- So we include a value C to pull the running total down a little bit. -->
+<!-- The bigger C is, the harder it is for S sub t to get large and the less sensitive the method will be. -->
+<!-- And the smaller C gets, the more sensitive the method is because S sub t can get larger faster. -->
+
+<!-- - Detecting an increase -->
+
+<!-- $\LARGE{S_t} = \LARGE{max(0, S_{t-1} + (x_t - \mu - C)}$ -->
+
+<!-- Is $\LARGE{S_t \geq T}$ ? -->
+
+<!-- - Detecting a decrease -->
+
+<!-- $\LARGE{S_t} = \LARGE{max(0, S_{t-1} + (\mu - x_t- C)}$ -->
+
+<!-- Is $\LARGE{S_t \geq T}$ ? -->
+
+<!-- ```{r} -->
+<!-- years = as.list(unique(as.character(dts$year))) -->
+<!-- summer_center <- mean(dts$FF_1) -->
+<!-- summer_sd <- sd(dts$FF_1) -->
+
+<!-- for (i in seq_along(years)) { -->
+<!--   year_index <- years[[i]] -->
+<!--   df <- dts %>% -->
+<!--     filter(month < 8) %>%  -->
+<!--     filter(as.character(year) == year_index) %>% -->
+<!--     dplyr::select(FF_1) -->
+<!--   # fit a cusum model to that year -->
+<!--   qsum <- qcc::cusum( -->
+<!--     data = df$FF_1, -->
+<!--     centervalue = summer_mean, -->
+<!--     std.dev = summer_sd, -->
+<!--     se.shift = 1.96, -->
+<!--     plot = T) -->
+<!--   } -->
+<!-- ``` -->
+
+
+

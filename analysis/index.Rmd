@@ -1,5 +1,6 @@
 ---
-title: "Home"
+title: "Excelencia Operacional"
+author: "Cecil V." 
 site: workflowr::wflow_site
 output:
   workflowr::wflow_html:
@@ -8,4 +9,14 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+## Project overview
+
+1. [Evaluation of increase in Throughput for Grinding circuit process](comminution.html) 
+
+2. [Mine](station-map.html)
+
+3. [Feature importance and prediction of filtering rate in port](port.html) 
+
+## Credits
+
+This project was developed by [Cecil V.](https://www.ceanver.com) at [CONTAC](https://projects.ceanver.com).

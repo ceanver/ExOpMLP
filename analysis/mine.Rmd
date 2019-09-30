@@ -1,0 +1,343 @@
+---
+title: "Excelencia Operacional Mina"
+author: "Cecil V."
+date: '`r Sys.Date()`'
+output:
+  workflowr::wflow_html:
+    theme: flatly
+    number_sections: true
+    toc: true
+    code_folding: hide  
+    highlight: tango
+---
+
+<style type="text/css">
+body{ /* Normal  */
+      font-size: 14px;
+  }
+td {  /* Table  */
+  font-size: 12px;
+}
+h1, .h1, h2, .h2, h3, .h3 {
+    margin-top: 10.5px;
+    margin-bottom: 10.5px;
+}
+h1.title {
+  font-size: 28px;
+  <!-- color: #7db956; -->
+}
+h1 { /* Header 1 */
+  font-size: 28px;
+  <!-- color: #3e4a52; -->
+}
+h2 { /* Header 2 */
+    font-size: 18px;
+  <!-- color: #3e4a52; -->
+}
+h3 { /* Header 3 */
+  font-size: 14px;
+  <!-- color: #3e4a52; -->
+}
+code.r{ /* Code block */
+    font-size: 12px;
+}
+pre { /* Code block - determines code spacing between lines */
+    font-size: 14px;
+}
+th.sorting { /* DT column headers  */
+    text-align: left;
+}
+.nav>li>a { /* Tabs  */
+    <!-- color: #3e4a52; -->
+    font-size: 14px;
+    /* font-weight: bold; */
+}
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+    <!-- color: #7db956; -->
+    }
+</style>
+
+```{r setup, include=FALSE, echo=FALSE}
+# knitr::opts_chunk$set(echo=TRUE, error=FALSE)
+DIR_PATH = rprojroot::find_rstudio_root_file()
+knitr::opts_chunk$set(comment = "#", collapse = TRUE)
+knitr::opts_knit$set(root.dir = DIR_PATH)
+                     
+# General functions and models #
+library(ggthemes)
+library(ggridges)
+library(plotly)
+library(tibbletime) # Time aware tibbles
+library(GGally) # clustering pair plot
+library(reticulate) # python
+library(xgboost) # 
+library(SHAPforxgboost)
+library(glmnet)
+require(caretEnsemble) # ensemble modelling
+library(gridExtra)
+# general visualisation #
+library(ggplot2) # visualisation
+library(grid) # visualisation
+library(corrplot) # correlation plot matrix
+library(RColorBrewer) # Colours
+require(DT) # display data in html tables
+
+library(here)
+library(tidyr)
+library(anomalize)## time seeries anomalies
+
+# general data manipulation #
+library(dplyr) # data manipulation
+library(data.table) # data manipulation
+library(tibble) # data wrangling
+library(caret) # Clasiffication And Regression Training
+library(psych) # skew
+
+library(VIM)
+# specific visualisation #
+
+# specific data manipulation #
+library(janitor) # clean headers
+library(naniar) # missing data
+library(mice) # Imputation
+library(broom)
+
+library(lubridate)
+# Date plus forecast
+
+knitr::knit_engines$set(python = reticulate::eng_python)
+py_available(TRUE)
+```
+
+# Introduction
+
+## Objectives
+
+- Analizar y evaluar variables que afectan el tiempo de viaje en principales circuitos.
+
+- Reproducción de escenario en áreas de interferencia/cuellos de botella/horarios específicos en donde se registra una baja en velocidad/productividad
+
+- Estimar componentes del tiempo de viaje asociado a congestión, interferencias, intersecciones, curvas y condiciones particulares en tramos específicos.
+
+- Evaluar su efecto y posible reducción.
+
+- Evaluación del comportamiento de la variable ante escenarios particulares (invierno por ej.)
+
+- Modelamiento matemático y Simulación ante distintas estrategias de operación y diseño: optimización de utilización/rendimiento, rutas libres, etc.
+
+# Dependencies {.tabset}
+
+## Required libraries 
+  
+## Load data {.tabset}
+
+### Setup Python imports
+
+```{python}
+import sys
+sys.path.append(str(r.DIR_PATH) + "/code")
+from utils_mine import *
+from utils_gps import *
+import pandas as pd
+```
+
+<!-- ## Cleaning data -->
+
+<!-- ```{python} -->
+<!-- utils.mine.clean_data("2017 Transporte.xlsx", "2018 Transporte.xlsx", "2019 Transporte.xlsx") -->
+<!-- ``` -->
+
+<!-- ## Group gps data by trip -->
+<!-- ```{python GroupByTrip} -->
+<!-- ## Group by trip -->
+<!-- df_gps = pd.read_csv('data/gps_data.csv', sep = ',') -->
+<!-- print(f'gps_data.csv has {df_gps.shape[0]} rows and {df_gps.shape[1]} columns: =>') -->
+<!-- df_gps = df_gps.dropna(how = 'any') -->
+<!-- col_list = ['trip_id', 'Norte', 'Este','Cota', 'VelCalc', 'trip_freq', "origin", "destination"] -->
+<!-- df_list = group_trips(df_gps, col_list) -->
+<!-- df_traj, df_trip = df_list[0], df_list[1]  -->
+<!-- print(f'df_traj has {df_traj.shape[0]} rows and {df_traj.shape[1]} columns: =>') -->
+<!-- print(f'df_trip has {df_trip.shape[0]} rows and {df_trip.shape[1]} columns: =>') -->
+<!-- ``` -->
+
+<!-- ## Loading processed data to R {.tabset} -->
+
+<!-- <!-- ```{python} --> -->
+<!-- <!-- mine_data = pd.read_csv('data/caex_data.csv', sep = ',') --> -->
+
+<!-- <!-- df_dest = mine_data.copy() --> -->
+<!-- <!-- ######### Agregando rutas similares ######### --> -->
+<!-- <!-- # df_dest['destination'] = df_dest['destination'].replace({'CH-02':'CH', 'CH-1':'CH', }) --> -->
+<!-- <!-- ######### Agregando rutas similares ######### --> -->
+<!-- <!-- df_dest['dest_count'] = 1  --> -->
+<!-- <!-- dest = df_dest[['destination', 'dest_count']].groupby('destination', as_index=False).sum() --> -->
+<!-- <!-- print("Number of actual routes:", len(dest)) --> -->
+<!-- <!-- dest_ranks = np.argsort(-dest['dest_count']) --> -->
+<!-- <!-- dest_top = dest.iloc[dest_ranks[:6]] --> -->
+<!-- <!-- # df_train = df_train[df["days since"]  --> -->
+<!-- <!-- # origins_top10 = origins_top10.rename(columns={'RUTA': 'ID', 'COUNT': 'Count'}) --> -->
+<!-- <!-- # origins_top10 = origins_top10.merge(airport_codes, how='left', left_on='ID', right_on='Code') --> -->
+<!-- <!-- del df_dest['dest_count'] --> -->
+<!-- <!-- # display(dest_top) ##ONLY TAKE TOP 10 FOR NOW --> -->
+<!-- <!-- list(dest_top["destination"]) --> -->
+<!-- <!-- df_dest = df_dest[df_dest.destination.isin(list(dest_top["destination"]))].reset_index(drop=True) --> -->
+<!-- <!-- # Prints the top 10, according to your calculation: --> -->
+
+<!-- <!-- df_orig = mine_data.copy() --> -->
+<!-- <!-- ######### Agregando rutas similares ######### --> -->
+<!-- <!-- df_orig['origin'] = df_orig['origin'].replace({'F10N':'F10', 'F10E':'F10', 'F9SE':'F9', 'F9PD':'F9', 'F7R1': 'F7'}) --> -->
+<!-- <!-- ######### Agregando rutas similares ######### --> -->
+<!-- <!-- df_orig['orig_count'] = 1  --> -->
+<!-- <!-- orig = df_orig[['origin', 'orig_count']].groupby('origin', as_index=False).sum() --> -->
+<!-- <!-- print("Number of actual origins:", len(orig)) --> -->
+<!-- <!-- orig_ranks = np.argsort(-orig['orig_count']) --> -->
+<!-- <!-- orig_top = orig.iloc[orig_ranks[:4]] --> -->
+<!-- <!-- del df_orig['orig_count'] --> -->
+<!-- <!-- # display(orig_top) ##ONLY TAKE TOP 10 FOR NOW --> -->
+<!-- <!-- list(orig_top["origin"]) --> -->
+<!-- <!-- df_orig = df_orig[df_orig.origin.isin(list(orig_top["origin"]))].reset_index(drop=True) --> -->
+<!-- <!-- # Prints the top 10, according to your calculation: --> -->
+
+<!-- <!-- df_route = df_orig[df_orig.origin.isin(list(orig_top["origin"]))].reset_index(drop=True) --> -->
+<!-- <!-- df_route = df_route[df_route.destination.isin(list(dest_top["destination"]))].reset_index(drop=True) --> -->
+<!-- <!-- df_route["route"] = df_route["origin"] + "_" + df_route["destination"] --> -->
+<!-- <!-- df_route['route_count'] = 1  --> -->
+<!-- <!-- route = df_route[['route', 'route_count']].groupby('route', as_index=False).sum() --> -->
+<!-- <!-- # print("Number of actual route:", len(route)) --> -->
+<!-- <!-- route_ranks = np.argsort(-route['route_count']) --> -->
+<!-- <!-- route_top = route.iloc[route_ranks[:8]].reset_index(drop = True) --> -->
+<!-- <!-- del df_route['route_count'] --> -->
+<!-- <!-- df_route = df_route[df_route.route.isin(list(route_top["route"]))].reset_index(drop=True) --> -->
+<!-- <!-- ``` --> -->
+
+<!-- ```{r Loading data to R} -->
+<!-- mine <- as_tibble(fread("data/caex_data.csv")) %>%  -->
+<!--   filter(str_detect(date, "2019")) %>%  -->
+<!--   mutate(date = ymd(date)) -->
+
+<!-- tail(mine) -->
+<!-- summary(mine) -->
+<!-- str(mine) -->
+<!-- ``` -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ```{r} -->
+<!-- kpI_real <- mine %>%  -->
+<!--     filter(str_detect(route, "F10_chancado")) -->
+<!-- F7_chancado -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- unique(F7_chancado$origen_2) -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- kpi_real <- mine %>%  -->
+<!--   # filter(str_detect(origen_2, "F10N-3440")) %>%  -->
+<!--   group_by(date) %>% -->
+<!--   summarise_if(is.numeric, mean, na.rm = TRUE) %>%  -->
+<!--   rename(daily_prod = tonelaje_fc) -->
+
+<!-- kpi_real -->
+
+
+
+<!--   # ggplot(aes(date, mean_tdV)) + -->
+<!--   # geom_line() + -->
+<!--   # # geom_smooth(method = "loess", color = "blue", span = 1/7) + -->
+<!--   # labs(y = "All visitors", x = "Date") -->
+<!-- ``` -->
+
+
+<!-- ```{r} -->
+<!-- kpi_real %>% -->
+<!--   # filter(visit_date > ymd("2016-04-15") & visit_date < ymd("2016-06-15")) %>% -->
+<!--   # group_by(visit_date) %>% -->
+<!--   # summarise(all_visitors = sum(visitors)) %>% -->
+<!--   ggplot(aes(date, daily_prod)) + -->
+<!--   geom_line() + -->
+<!--   geom_smooth(method = "loess", color = "blue", span = 1/7) + -->
+<!--   labs(y = "All visitors", x = "Date") -->
+<!-- ``` -->
+
+
+
+<!-- ```{r} -->
+<!-- p1 <- train %>% -->
+
+<!--   ggplot(aes(trip_duration)) + -->
+
+<!--   geom_density(fill = "red", alpha = 0.5) + -->
+
+<!--   geom_density(aes(total_travel_time), fill = "blue", alpha = 0.5) + -->
+
+<!--   scale_x_log10() + -->
+
+<!--   coord_cartesian(xlim = c(5e1, 8e3)) -->
+
+
+
+<!-- p2 <- train %>% -->
+
+<!--   ggplot(aes(dist)) + -->
+
+<!--   geom_density(fill = "red", alpha = 0.5) + -->
+
+<!--   geom_density(aes(total_distance), fill = "blue", alpha = 0.5) + -->
+
+<!--   scale_x_log10() + -->
+
+<!--   coord_cartesian(xlim = c(2e2, 5e4)) -->
+
+
+
+<!-- p3 <- train %>% -->
+
+<!--   ggplot(aes(trip_duration, total_travel_time)) + -->
+
+<!--   geom_bin2d(bins = c(120,120)) + -->
+
+<!--   geom_abline(intercept = 0, slope = 1, colour = "red") + -->
+
+<!--   theme(legend.position = "none") -->
+
+
+
+<!-- p4 <- train %>% -->
+
+<!--   ggplot(aes(dist, total_distance)) + -->
+
+<!--   geom_bin2d(bins = c(70,70)) + -->
+
+<!--   geom_abline(intercept = 0, slope = 1, colour = "red") + -->
+
+<!--   theme(legend.position = "none") -->
+
+
+
+<!-- layout <- matrix(c(1,2,3,4),2,2,byrow=TRUE) -->
+
+<!-- multiplot(p1, p2, p3, p4, layout=layout) -->
+<!-- ``` -->
+
