@@ -3,7 +3,8 @@ title: "Excelencia Operacional Puerto"
 author: "Cecil V."
 date: '`r Sys.Date()`'
 output:
-  workflowr::wflow_html: 
+  html_document:
+  # workflowr::wflow_html: 
     theme: flatly
     number_sections: true
     toc: true
@@ -16,14 +17,14 @@ output:
 
 The goal of this project is to provide an insight of what are the main features that affect the filtering rate at port. Additionally, we aim to construct a predictive model that will be able to give an accurate result for the filtering rate beforehand.
 
-# Dependencies {.tabset}
-
-## Required libraries
 ```{r setup, include=FALSE, echo=FALSE}
 knitr::opts_chunk$set(comment = "#", collapse = TRUE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 
 # General functions and models #
+library("xts")
+library("highcharter")
+library(gridExtra)
 library(reticulate) # python
 library(xgboost) # 
 library(SHAPforxgboost)
@@ -58,34 +59,9 @@ library(broom)
 
 library(lubridate)
 # Date plus forecast
-
-## Helper functions 
 ```
 
-```{r meesage=FALSE}
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  plots <- c(list(...), plotlist)
-  numPlots = length(plots)
-  if (is.null(layout)) {
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                    ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-
- if (numPlots==1) {
-    print(plots[[1]])
-  } else {
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-
-    for (i in 1:numPlots) {
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
-```
+# Load port data {.tabset .tabset-fade .tabset-pills}
 
 ## Load data to py
 
@@ -93,11 +69,11 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 import os
 import pandas as pd
 import numpy as np
-df_port = pd.read_excel('data/port/Data Diaria 2018 2019.xlsx', usecols = 'B:U')
+df_port = pd.read_excel('data/port/Data Diaria 2018 2019 Sept.xlsx', usecols = 'B:U')
 
 df_port.rename(columns = {'Día Operacional': 'date'}, inplace=True)
-df_port = df_port.drop(columns = ["date"])
-# df_port['date'] = pd.to_datetime(df_port['date'])
+# df_port = df_port.drop(columns = ["date"])
+df_port['date'] = pd.to_datetime(df_port['date'])
 # df_port = df_port.set_index('date')
 
 # display(set(df_filtering.loc[~df_filtering["pH"].astype(str).str.isdigit(), "pH"].tolist())) 
@@ -116,8 +92,13 @@ df_port.to_csv("data/port/df_port.csv", index = False)
 
 ```{r}
 port <- as_tibble(fread("data/port/df_port.csv"))
+
+port$na_count <- apply(port, 1, function(x) sum(is.na(x)))
+
 port <- port %>%
   clean_names(., "snake") %>% 
+  mutate(Date = as.Date(port$date),
+         Date = ymd(Date)) %>% 
   rename(
       hum_pct = humedad_percent, # % de humedad
       x10_pct = x10_number_percent, 
@@ -133,17 +114,22 @@ port <- port %>%
       tft_visc = tft_viscosidad, # tft Viscocidad
       insol = insoluble, # Cantidad de insolubles ???
       temp = temperatura # Temperatura
-      )
+      ) %>% 
+  select(-c(date)) %>% 
+  filter(na_count < 5)
 
-port$na_count <- apply(port, 1, function(x) sum(is.na(x)))
 
-dim(port)
-summary(port)
+headTail(port)
 ```
 
-# Data engineering
+## List of variables
+
+```{r}
+glimpse(port)
+```
 
 ## Check variable data type
+
 ```{r}
 # sapply(port, class)
 categ_cols <- names(port[,sapply(port, is.character)])
@@ -153,7 +139,7 @@ cat('There are', length(categ_cols), 'remaining columns with character values')
 Since categorical variables enter into statistical models differently than continuous variables, storing data as factors insures that the modeling functions will treat such data correctly. The code performs the following tasks: rename variable names, change data type to factor and order ordinal factors. 
 
 
-# Descriptive statistics {.tabset}
+# Descriptive statistics {.tabset .tabset-fade .tabset-pills}
 
 Descriptive statistics describe quantitatively the basic features of the data. These statistics will give us a head start by providing information about stuff like skewness, outliers (range) missing data points and (near) zero variance.
 
@@ -169,9 +155,9 @@ datatable(round(descStats,2), rownames = T,
           options = list(pageLength = 8)) ## Interactive HTML table
 ```
 
-# Missing values {.tabset}
+## Missing values {.tabset}
 
-## Frequency
+### Frequency
 
 With this plot we can see that the variables that present the highest amount of missing data are:
 - *esfuerzo de corte* 
@@ -185,7 +171,7 @@ With this plot we can see that the variables that present the highest amount of 
 gg_miss_var(port)
 ```
 
-## Missing data representated geometrically
+### Missing data representated geometrically
 
 The variables mentiones above are represented graphycally to search for any pattern. In this graph, the data which is missing, is given a value of 10% less than the minimum value of the available data. Then, it's represented in a dispersion graph were the red color represents the missing data.
 
@@ -215,13 +201,12 @@ p6 <- port %>%
   ggplot(aes(x = tft_floc, y = tasa_filt)) +
   geom_miss_point()
 
-layout <- matrix(c(1,2,3,4,5,6), 3, 2,byrow=TRUE)
-multiplot(p1, p2, p3, p4, p5, p6, layout=layout)
+grid.arrange(p1, p2, p3, p4, ncol = 2, nrow = 2)
 ```
 
 There is no insight in regards to any pattern correlated to the filter rate. 
 
-## More information about missing data and combinations.
+### More information about missing data and combinations.
 
 In this part, we aim to answer the question: in which variables observations are missing, and how many? Aggregation plots are a useful tool for answering these questions. The one-liner below is all you need.
 
@@ -231,12 +216,200 @@ aggr_plot <- aggr(port, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, la
 
 It's difficult to give any insight in regards to missing data.
 
-## Imputation
+# Time trendings {.tabset .tabset-fade .tabset-pills}
+
+## tasa_filt
+  
+```{r}
+time_series = xts(port$tasa_filt, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "tasa_filt") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## hum_pct
+
+```{r}
+time_series = xts(port$hum_pct, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "hum_pct") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## x10_pct
+
+```{r}
+time_series = xts(port$x10_pct, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "x10_pct") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## insol
+
+```{r}
+time_series = xts(port$insol, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "insol") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## Na_gpl
+
+```{r}
+time_series = xts(port$Na_gpl, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "Na_gpl") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## sulfato_mg_l
+
+```{r}
+time_series = xts(port$sulfato_mg_l, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "sulfato_mg_l") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## cloruro_mg_l
+
+```{r}
+time_series = xts(port$cloruro_mg_l, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "cloruro_mg_l") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## conduct
+
+```{r}
+time_series = xts(port$conduct, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "conduct") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## ph
+
+```{r}
+time_series = xts(port$ph, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "ph") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## cot
+
+```{r}
+time_series = xts(port$cot, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "cot") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## ca_ppm
+
+```{r}
+time_series = xts(port$ca_ppm, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "ca_ppm") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## tft_ca_pct
+
+```{r}
+time_series = xts(port$tft_ca_pct, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "tft_ca_pct") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## Cu_S_gpl
+
+```{r}
+time_series = xts(port$Cu_S_gpl, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "Cu_S_gpl") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## tft_visc
+
+```{r}
+time_series = xts(port$tft_visc, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "tft_visc") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## tft_floc
+
+```{r}
+time_series = xts(port$tft_floc, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "tft_floc") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## sol_filt_pct & sol_recep_pct
+
+```{r}
+time_series_1 = xts(port$sol_filt_pct, order.by= port$Date)
+time_series_2 = xts(port$sol_recep_pct, order.by= port$Date)
+
+hchart(time_series_1, name = "sol_filt_pct") %>% 
+    hc_add_series(time_series_2, name = "sol_recep_pct") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "solids") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## temp
+
+```{r}
+time_series = xts(port$temp, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "temp") %>%
+  hc_legend(enabled = TRUE)
+```
+
+## esf_corte
+
+```{r}
+time_series = xts(port$esf_corte, order.by= port$Date)
+hchart(time_series, name = "Value") %>% 
+    hc_add_theme(hc_theme_darkunica()) %>%
+  hc_title(text = "esf_corte") %>%
+  hc_legend(enabled = TRUE)
+```
+
+
+# Imputation
 
 Finally, we decide to imputate the data. The technique used is Predictive Mean Matching (PAM) algorithm. Two data frames are generated, one with imputated data *df*, and the other one with only the rows that have no missing data *df_port*.
+Note: We drop *esf_corte* and *tft_ca_pct* since they exhibit a high amount of missing variables. Furthermore, it can be shown that their effect is negligable for the prediction of the filtering rate.
 
 ```{r include=FALSE}
 imp <- port %>% 
+  select(-c(esf_corte, tft_ca_pct, Date)) %>% 
   mice(m = 5, maxit = 50, meth = 'pmm', seed = 500, trace = FALSE)
 
 #We rename de port to data now. Filter rate is converted to target.
@@ -246,11 +419,11 @@ df <- complete(imp, 3) %>%
 
 df_port <- na.omit(port) %>%
   rename(target = tasa_filt) %>% 
-  select(-c(na_count))
+  select(-c(na_count, Date))
 ```
 
 
-# Correlations overview{.tabset}
+# Correlations overview {.tabset .tabset-fade .tabset-pills}
 
 After engineering new features and before starting the modelling, we will visualise the relations between our parameters using a *correlation matrix*. For this, we need to change all the input features into a numerical format. The visualisation uses the *corrplot* function from the eponymous package. *Corrplot* gives us great flexibility in manipulating the style of our plot.
 
@@ -261,7 +434,6 @@ Here, we are of course interested if and how strongly our features correlate wit
 ## Correlation matrix with imputated data.
 
 ```{r echo=FALSE, fig.width=14, fig.height=14}
-
 cor_M <- cor(df)
 
 ## plot correlation
@@ -307,7 +479,6 @@ We find:
 ## Correlation matrix with dropped missing data.
 
 ```{r echo=FALSE, fig.width=14, fig.height=14}
-
 cor_M <- cor(df_port)
 
 ## plot correlation
@@ -388,7 +559,7 @@ df.m %>%
 <!-- plt.show() -->
 <!-- ``` -->
 
-# Data preparation {.tabset}
+# Data preparation {.tabset .tabset-fade .tabset-pills}
 
 ## Train Test split
 
@@ -401,7 +572,6 @@ te <- df[-tr_te_i,]
 dim(tr)
 dim(te)
 ```
-
 
 ## Scaling target variable (Imputated data set)
 
@@ -470,7 +640,7 @@ y <- tr$target # X_train
 ```
 
 
-# Machine learning model {.tabset}
+# Machine learning model {.tabset .tabset-fade .tabset-pills}
 
 ## Ensemble eXtreme Gradient Boosting + Ridge Regression
 
@@ -536,65 +706,45 @@ modelCor(resamples(modelList))
 
 ## Performance summary
 
-```{r echo=FALSE}
+```{r}
 summary(resamples(modelList))[[3]][2:3]
 ```
 
 ## Summary
 
 ```{r}
-
 set.seed(333)
-
 greedyEnsemble <- caretEnsemble(
-
   modelList, 
-
   metric="RMSE",
-
   trControl=trainControl(
-
     number=7, method = "cv"
-
   ))
-
 summary(greedyEnsemble)
 ```
 
 ## Q-Q plot residuals
 
-```{r echo=FALSE}
+```{r}
 qqnorm(resid(greedyEnsemble$ens_model$finalModel), 
-
                 ylab="standardized Residuals", 
-
                 xlab="normal Scores", 
-
                 main="Q-Q plot residuals") 
-
 qqline(resid(greedyEnsemble$ens_model$finalModel))
 ```
 
-# Feature importance {.tabset}
+# Feature importance {.tabset .tabset-fade .tabset-pills}
 
 ## Ridge regression
 
-```{r echo=FALSE}
-
+```{r}
 featureImp <- varImp(greedyEnsemble$models$glmnet.1)
-
 ggplot(featureImp, mapping = NULL,
-
   top = dim(featureImp$importance)[1]-(dim(featureImp$importance)[1]- 9), environment = NULL) +
-
     xlab("Feature") +
-
     ylab("Importace") +
-
           theme(text = element_text(size=9))
-
 ```
-
 
 ## SHAP XGB with optimal parameters
 
@@ -625,53 +775,23 @@ shap_long <- shap.prep(xgb_model = mod, X_train = X)
 
 ```
   
-
-## Plot
-
-```{r}
-imp_matrix <- as.tibble(xgb.importance(feature_names = colnames(X), model = mod))
-
-
-
-imp_matrix %>%
-
-  ggplot(aes(reorder(Feature, Gain, FUN = max), Gain, fill = Feature)) +
-
-  geom_col() +
-
-  coord_flip() +
-
-  theme(legend.position = "none") +
-
-  labs(x = "Features", y = "Importance")
-```
-
+## Importance ranked
 
 ```{r}
 imp_matrix <- as.matrix(shap_values$mean_shap_score)
-rownames(imp_matrix)
+# rownames(imp_matrix)
 imp_matrix <- as.tibble(data.frame(Feature = row.names(imp_matrix), Importance = imp_matrix))
 
-imp_matrix
-imp_matrix %>%
-
-  ggplot(aes(reorder(Feature, Importance, FUN = max), Importance, fill = Feature)) +
-
-  geom_col() +
-
-  coord_flip() +
-
-  theme(legend.position = "none") +
-
-  labs(x = "Variables", y = "Importancia relativa")
+imp_matrix %>% 
+  ggplot(aes(reorder(Feature, Importance, FUN = max), Importance, fill =
+               Feature)) +
+    geom_col() +
+    coord_flip() +
+    theme(legend.position = "none") +
+    labs(x = "Variables", y = "Importancia relativa")
 ```
 
-```{r}
-shap_values$mean_shap_score
-```
 
-  
-  
 ## Summary plot
 
 The following plot shows the most important features, and their impact on the filtering rate.
@@ -717,3 +837,4 @@ g4 <- shap.plot.dependence(data_long = shap_long,
 gridExtra::grid.arrange(g3, g4, ncol=2)
 ```
 
+  
